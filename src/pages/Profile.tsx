@@ -3,18 +3,9 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Bell, User, Shield, Star, Settings } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import type { Database } from "@/integrations/supabase/types";
 
-interface Profile {
-  id: string;
-  username: string;
-  full_name: string;
-  avatar_url: string | null;
-  notification_preferences: {
-    goals: boolean;
-    matchStart: boolean;
-    favorites: boolean;
-  };
-}
+type Profile = Database['public']['Tables']['profiles']['Row'];
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -32,9 +23,9 @@ const Profile = () => {
         }
 
         const { data, error } = await supabase
-          .from("profiles")
-          .select("*")
-          .eq("id", user.id)
+          .from('profiles')
+          .select('*')
+          .eq('id', user.id)
           .single();
 
         if (error) throw error;
@@ -72,7 +63,7 @@ const Profile = () => {
               {profile?.avatar_url ? (
                 <img
                   src={profile.avatar_url}
-                  alt={profile.username}
+                  alt={profile.username || ''}
                   className="w-full h-full rounded-full object-cover"
                 />
               ) : (
@@ -105,14 +96,24 @@ const Profile = () => {
                 <Bell className="w-5 h-5 text-primary" />
                 <span>Notificações</span>
               </div>
-              <button className="text-sm text-primary">Configurar</button>
+              <button 
+                onClick={() => navigate('/settings')} 
+                className="text-sm text-primary"
+              >
+                Configurar
+              </button>
             </div>
             <div className="flex items-center justify-between p-4 rounded-lg bg-secondary/50">
               <div className="flex items-center gap-3">
                 <Settings className="w-5 h-5 text-primary" />
                 <span>Preferências</span>
               </div>
-              <button className="text-sm text-primary">Editar</button>
+              <button 
+                onClick={() => navigate('/settings')} 
+                className="text-sm text-primary"
+              >
+                Editar
+              </button>
             </div>
           </div>
         </div>
