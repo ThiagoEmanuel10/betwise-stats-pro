@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -11,11 +11,15 @@ import { ArrowLeft, User } from "lucide-react";
 import type { Database } from "@/integrations/supabase/types";
 
 type Profile = Database['public']['Tables']['profiles']['Row'];
+type NotificationPreferences = {
+  goals: boolean;
+  matchStart: boolean;
+  favorites: boolean;
+};
 
 const Settings = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
-  const [profile, setProfile] = useState<Profile | null>(null);
   const [formData, setFormData] = useState({
     username: "",
     fullName: "",
@@ -23,10 +27,10 @@ const Settings = () => {
       goals: true,
       matchStart: true,
       favorites: true,
-    },
+    } as NotificationPreferences,
   });
 
-  useState(() => {
+  useEffect(() => {
     const getProfile = async () => {
       try {
         const { data: { user } } = await supabase.auth.getUser();
@@ -43,11 +47,10 @@ const Settings = () => {
 
         if (error) throw error;
 
-        setProfile(data);
         setFormData({
           username: data.username || "",
           fullName: data.full_name || "",
-          notifications: data.notification_preferences || {
+          notifications: (data.notification_preferences as NotificationPreferences) || {
             goals: true,
             matchStart: true,
             favorites: true,
@@ -88,7 +91,7 @@ const Settings = () => {
     }
   };
 
-  const toggleNotification = (key: keyof typeof formData.notifications) => {
+  const toggleNotification = (key: keyof NotificationPreferences) => {
     setFormData((prev) => ({
       ...prev,
       notifications: {
