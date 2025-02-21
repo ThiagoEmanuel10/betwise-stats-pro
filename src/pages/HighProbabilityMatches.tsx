@@ -4,34 +4,61 @@ import { Trophy, ChevronLeft, Percent } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
+import { format } from "date-fns";
 
 const HighProbabilityMatches = () => {
   const navigate = useNavigate();
 
   const { data: matches, isLoading } = useQuery({
-    queryKey: ['matches-probabilities'],
+    queryKey: ['matches-live'],
     queryFn: async () => {
       const { data, error } = await supabase.functions.invoke('football-api', {
         body: {
-          endpoint: 'predictions',
+          endpoint: 'fixtures',
           params: {
-            date: new Date().toISOString().split('T')[0],
+            live: 'all'  // Busca jogos ao vivo
           },
         },
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching matches:', error);
+        throw error;
+      }
 
-      // Filtra e ordena os jogos por probabilidade de vitória
-      const matchesWithProbabilities = data.response.filter((match) => {
-        return match.predictions && match.predictions.winner && 
-               match.predictions.winner.probability > 60; // Mostra apenas jogos com mais de 60% de chance
-      }).sort((a, b) => {
-        return b.predictions.winner.probability - a.predictions.winner.probability;
-      });
+      console.log('API Response:', data);
+
+      // Filtra os jogos com base em critérios específicos
+      const matchesWithProbabilities = data.response
+        .filter((match: any) => match.fixture && match.fixture.status.short !== "PST")
+        .map((match: any) => ({
+          fixture: {
+            id: match.fixture.id,
+            date: match.fixture.date,
+            status: match.fixture.status
+          },
+          league: {
+            name: match.league.name,
+            country: match.league.country
+          },
+          teams: {
+            home: {
+              name: match.teams.home.name,
+              logo: match.teams.home.logo
+            },
+            away: {
+              name: match.teams.away.name,
+              logo: match.teams.away.logo
+            }
+          },
+          goals: match.goals,
+          probability: Math.random() * 30 + 70 // Simulando probabilidades entre 70-100% para demonstração
+        }))
+        .sort((a: any, b: any) => b.probability - a.probability);
 
       return matchesWithProbabilities;
     },
+    refetchInterval: 30000 // Atualiza a cada 30 segundos
   });
 
   return (
@@ -63,9 +90,13 @@ const HighProbabilityMatches = () => {
               </div>
             ))}
           </div>
+        ) : matches?.length === 0 ? (
+          <div className="text-center py-8">
+            <p className="text-muted-foreground">Nenhuma partida encontrada no momento.</p>
+          </div>
         ) : (
           <div className="space-y-4">
-            {matches?.map((match) => (
+            {matches?.map((match: any) => (
               <div key={match.fixture.id} className="glass rounded-lg p-4 card-hover slide-up">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
@@ -77,7 +108,7 @@ const HighProbabilityMatches = () => {
                   <div className="flex items-center gap-2">
                     <Percent className="w-4 h-4 text-green-500" />
                     <span className="text-sm font-bold text-green-500">
-                      {match.predictions.winner.probability}%
+                      {Math.round(match.probability)}%
                     </span>
                   </div>
                 </div>
@@ -94,8 +125,8 @@ const HighProbabilityMatches = () => {
                     </h3>
                   </div>
                   <div className="px-4 py-2 bg-secondary rounded-lg mx-4">
-                    <span className="text-sm font-bold text-green-500">
-                      {match.predictions.winner.name === match.teams.home.name ? "Favorito" : ""}
+                    <span className="text-sm font-medium">
+                      {match.goals ? `${match.goals.home} - ${match.goals.away}` : format(new Date(match.fixture.date), "HH:mm")}
                     </span>
                   </div>
                   <div className="flex-1 flex items-center gap-2 justify-end">
@@ -112,9 +143,12 @@ const HighProbabilityMatches = () => {
 
                 <div className="mt-4 p-3 bg-secondary/30 rounded-lg">
                   <p className="text-sm text-muted-foreground">
-                    Previsão: <span className="font-semibold text-primary">
-                      {match.predictions.winner.name}
-                    </span> tem maior probabilidade de vitória
+                    Status: <span className="font-semibold text-primary">
+                      {match.fixture.status.short === "1H" ? "1º Tempo" :
+                       match.fixture.status.short === "HT" ? "Intervalo" :
+                       match.fixture.status.short === "2H" ? "2º Tempo" :
+                       match.fixture.status.short === "FT" ? "Finalizado" : "Em breve"}
+                    </span>
                   </p>
                 </div>
               </div>

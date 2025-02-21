@@ -19,6 +19,7 @@ serve(async (req) => {
     
     console.log(`Fetching from API-Football: ${endpoint}`, params);
 
+    // Para o plano gratuito, vamos usar o endpoint de fixtures com status ao vivo
     const url = new URL(`https://v3.football.api-sports.io/${endpoint}`);
     if (params) {
       Object.entries(params).forEach(([key, value]) => {
