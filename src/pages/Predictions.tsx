@@ -20,8 +20,10 @@ const Predictions = () => {
         body: {
           endpoint: 'fixtures',
           params: {
-            league: '39', // Premier League como exemplo
-            next: '10',
+            league: '39', // Premier League
+            season: '2023',
+            from: new Date().toISOString().split('T')[0],
+            to: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // próximos 7 dias
           },
         },
       });
@@ -34,8 +36,8 @@ const Predictions = () => {
   const filteredMatches = matches?.filter((match) => {
     const searchLower = searchTerm.toLowerCase();
     return (
-      match.fixture.teams.home.name.toLowerCase().includes(searchLower) ||
-      match.fixture.teams.away.name.toLowerCase().includes(searchLower)
+      match.teams.home.name.toLowerCase().includes(searchLower) ||
+      match.teams.away.name.toLowerCase().includes(searchLower)
     );
   });
 
