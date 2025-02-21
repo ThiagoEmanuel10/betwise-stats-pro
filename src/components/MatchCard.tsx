@@ -1,6 +1,7 @@
 
 import { Trophy, Calendar, ChevronRight } from "lucide-react";
 import { format } from "date-fns";
+import { useNavigate } from "react-router-dom";
 
 interface MatchCardProps {
   fixture: {
@@ -28,6 +29,7 @@ interface MatchCardProps {
 
 export const MatchCard = ({ fixture }: MatchCardProps) => {
   const matchDate = new Date(fixture.date);
+  const navigate = useNavigate();
   
   return (
     <div className="glass rounded-lg p-4 card-hover slide-up">
@@ -59,7 +61,10 @@ export const MatchCard = ({ fixture }: MatchCardProps) => {
         </div>
       </div>
       <div className="flex justify-center mt-4">
-        <button className="flex items-center gap-2 text-sm text-primary hover:underline transition-colors">
+        <button 
+          className="flex items-center gap-2 text-sm text-primary hover:underline transition-colors"
+          onClick={() => navigate(`/predictions`)}
+        >
           Ver estatísticas
           <ChevronRight className="w-4 h-4" />
         </button>
