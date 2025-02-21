@@ -1,7 +1,7 @@
-
-import { Trophy, Calendar, ChevronRight } from "lucide-react";
+import { Trophy, Calendar, ChevronRight, Percent } from "lucide-react";
 import { format } from "date-fns";
 import { useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 
 interface MatchCardProps {
   fixture: {
@@ -60,7 +60,7 @@ export const MatchCard = ({ fixture }: MatchCardProps) => {
           )}
         </div>
       </div>
-      <div className="flex justify-center mt-4">
+      <div className="flex justify-between items-center mt-4">
         <button 
           className="flex items-center gap-2 text-sm text-primary hover:underline transition-colors"
           onClick={() => navigate(`/predictions`)}
@@ -68,6 +68,16 @@ export const MatchCard = ({ fixture }: MatchCardProps) => {
           Ver estatísticas
           <ChevronRight className="w-4 h-4" />
         </button>
+
+        <Button
+          variant="ghost"
+          size="sm"
+          className="text-sm text-green-500 hover:text-green-600"
+          onClick={() => navigate('/high-probability')}
+        >
+          <Percent className="w-4 h-4 mr-2" />
+          Melhores Chances
+        </Button>
       </div>
     </div>
   );

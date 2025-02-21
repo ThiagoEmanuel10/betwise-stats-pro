@@ -12,6 +12,7 @@ import Settings from "./pages/Settings";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 import Predictions from "./pages/Predictions";
+import HighProbabilityMatches from "./pages/HighProbabilityMatches";
 
 const queryClient = new QueryClient();
 
@@ -51,6 +52,7 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/predictions" element={<Predictions />} />
+          <Route path="/high-probability" element={<HighProbabilityMatches />} />
           <Route
             path="/profile"
             element={
