@@ -1,36 +1,61 @@
 
 import { Trophy, Calendar, ChevronRight } from "lucide-react";
+import { format } from "date-fns";
 
 interface MatchCardProps {
-  homeTeam: string;
-  awayTeam: string;
-  league: string;
-  date: string;
-  time: string;
+  fixture: {
+    id: number;
+    date: string;
+    status: {
+      short: string;
+    };
+    league: {
+      name: string;
+      country: string;
+    };
+    teams: {
+      home: {
+        name: string;
+        logo?: string;
+      };
+      away: {
+        name: string;
+        logo?: string;
+      };
+    };
+  };
 }
 
-export const MatchCard = ({ homeTeam, awayTeam, league, date, time }: MatchCardProps) => {
+export const MatchCard = ({ fixture }: MatchCardProps) => {
+  const matchDate = new Date(fixture.date);
+  
   return (
     <div className="glass rounded-lg p-4 card-hover slide-up">
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2">
           <Trophy className="w-4 h-4 text-primary" />
-          <span className="text-sm font-medium text-primary">{league}</span>
+          <span className="text-sm font-medium text-primary">{fixture.league.name}</span>
         </div>
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <Calendar className="w-4 h-4" />
-          <span>{date}</span>
+          <span>{format(matchDate, "dd/MM")}</span>
         </div>
       </div>
       <div className="flex items-center justify-between mt-4">
-        <div className="flex-1">
-          <h3 className="font-semibold">{homeTeam}</h3>
+        <div className="flex-1 flex items-center gap-2">
+          {fixture.teams.home.logo && (
+            <img src={fixture.teams.home.logo} alt={fixture.teams.home.name} className="w-6 h-6 object-contain" />
+          )}
+          <h3 className="font-semibold truncate">{fixture.teams.home.name}</h3>
         </div>
         <div className="px-4 py-2 bg-secondary rounded-lg mx-4">
-          <span className="text-sm font-medium">{time}</span>
+          <span className="text-sm font-medium">{format(matchDate, "HH:mm")}</span>
         </div>
-        <div className="flex-1 text-right">
-          <h3 className="font-semibold">{awayTeam}</h3>
+        <div className="flex-1 flex items-center gap-2 justify-end">
+          <h3 className="font-semibold truncate">{fixture.teams.away.name}</h3>
+          {fixture.teams.away.logo && (
+            <img src={fixture.teams.away.logo} alt={fixture.teams.away.name} className="w-6 h-6 object-contain" />
+          )}
         </div>
       </div>
       <div className="flex justify-center mt-4">

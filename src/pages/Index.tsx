@@ -2,31 +2,28 @@
 import { Bell, User } from "lucide-react";
 import { MatchCard } from "@/components/MatchCard";
 import { StatisticsTab } from "@/components/StatisticsTab";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 const Index = () => {
-  const matches = [
-    {
-      homeTeam: "Liverpool",
-      awayTeam: "Manchester City",
-      league: "Premier League",
-      date: "27/03",
-      time: "16:30",
+  const { data: matches, isLoading } = useQuery({
+    queryKey: ['matches'],
+    queryFn: async () => {
+      const { data, error } = await supabase.functions.invoke('football-api', {
+        body: {
+          endpoint: 'fixtures',
+          params: {
+            league: '39', // Premier League
+            season: '2023',
+            next: '5', // Next 5 matches
+          },
+        },
+      });
+
+      if (error) throw error;
+      return data.response;
     },
-    {
-      homeTeam: "Real Madrid",
-      awayTeam: "Barcelona",
-      league: "La Liga",
-      date: "28/03",
-      time: "17:00",
-    },
-    {
-      homeTeam: "Flamengo",
-      awayTeam: "Palmeiras",
-      league: "Brasileirão",
-      date: "29/03",
-      time: "19:00",
-    },
-  ];
+  });
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-secondary">
@@ -49,11 +46,21 @@ const Index = () => {
       <main className="container mx-auto px-4 pb-8">
         <section className="mb-8 fade-in">
           <h2 className="text-2xl font-semibold mb-6">Jogos em Destaque</h2>
-          <div className="space-y-4">
-            {matches.map((match) => (
-              <MatchCard key={`${match.homeTeam}-${match.awayTeam}`} {...match} />
-            ))}
-          </div>
+          {isLoading ? (
+            <div className="space-y-4">
+              {[...Array(3)].map((_, i) => (
+                <div key={i} className="glass rounded-lg p-4 animate-pulse">
+                  <div className="h-20 bg-secondary/50 rounded-lg"></div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {matches?.map((match) => (
+                <MatchCard key={match.fixture.id} fixture={match.fixture} />
+              ))}
+            </div>
+          )}
         </section>
 
         <section className="fade-in">
