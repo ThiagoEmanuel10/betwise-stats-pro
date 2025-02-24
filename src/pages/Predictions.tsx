@@ -1,6 +1,6 @@
 
 import { useQuery } from "@tanstack/react-query";
-import { Search, Trophy, ChevronLeft, MessageSquare } from "lucide-react";
+import { Search, Trophy, ChevronLeft, MessageSquare, Star } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -8,9 +8,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { MatchCard } from "@/components/MatchCard";
 import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/components/ui/use-toast";
 
 const Predictions = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState("");
 
   const { data: matches, isLoading } = useQuery({
@@ -32,6 +34,79 @@ const Predictions = () => {
       return data.response;
     },
   });
+
+  const { data: favoriteMatches } = useQuery({
+    queryKey: ['favorite-matches'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('favorite_matches')
+        .select('match_id');
+      
+      if (error) throw error;
+      return data.map(match => match.match_id);
+    },
+  });
+
+  const toggleFavorite = async (match: any) => {
+    const { data: { session } } = await supabase.auth.getSession();
+    
+    if (!session) {
+      toast({
+        title: "Erro",
+        description: "Você precisa estar logado para favoritar partidas.",
+        variant: "destructive"
+      });
+      navigate('/auth');
+      return;
+    }
+
+    const matchId = match.fixture.id.toString();
+    const isFavorite = favoriteMatches?.includes(matchId);
+
+    if (isFavorite) {
+      const { error } = await supabase
+        .from('favorite_matches')
+        .delete()
+        .eq('match_id', matchId);
+
+      if (error) {
+        toast({
+          title: "Erro",
+          description: "Erro ao remover partida dos favoritos",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      toast({
+        description: "Partida removida dos favoritos"
+      });
+    } else {
+      const { error } = await supabase
+        .from('favorite_matches')
+        .insert({
+          match_id: matchId,
+          home_team: match.teams.home.name,
+          away_team: match.teams.away.name,
+          match_date: match.fixture.date,
+          league: 'Premier League',
+          user_id: session.user.id
+        });
+
+      if (error) {
+        toast({
+          title: "Erro",
+          description: "Erro ao adicionar partida aos favoritos",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      toast({
+        description: "Partida adicionada aos favoritos"
+      });
+    }
+  };
 
   const filteredMatches = matches?.filter((match) => {
     const searchLower = searchTerm.toLowerCase();
@@ -97,7 +172,9 @@ const Predictions = () => {
             {filteredMatches?.map((match) => (
               <MatchCard
                 key={match.fixture.id}
-                fixture={match.fixture}
+                fixture={match}
+                isFavorite={favoriteMatches?.includes(match.fixture.id.toString())}
+                onToggleFavorite={() => toggleFavorite(match)}
               />
             ))}
           </div>
