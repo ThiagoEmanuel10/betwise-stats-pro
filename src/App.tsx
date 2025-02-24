@@ -13,6 +13,7 @@ import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 import Predictions from "./pages/Predictions";
 import HighProbabilityMatches from "./pages/HighProbabilityMatches";
+import Chat from "./pages/Chat";
 
 const queryClient = new QueryClient();
 
@@ -54,6 +55,14 @@ const App = () => (
             <Route path="/auth" element={<Auth />} />
             <Route path="/predictions" element={<Predictions />} />
             <Route path="/high-probability" element={<HighProbabilityMatches />} />
+            <Route
+              path="/chat"
+              element={
+                <PrivateRoute>
+                  <Chat />
+                </PrivateRoute>
+              }
+            />
             <Route
               path="/profile"
               element={
