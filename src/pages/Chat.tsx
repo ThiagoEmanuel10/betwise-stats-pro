@@ -1,58 +1,81 @@
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { ChevronLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ChatMessage } from "@/components/ChatMessage";
+import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { useNavigate } from "react-router-dom";
-import { ChevronLeft, Send } from "lucide-react";
-import { toast } from "sonner";
+import { useQuery } from "@tanstack/react-query";
+
+interface Message {
+  id: string;
+  content: string;
+  user_id: string;
+  created_at: string;
+}
 
 const Chat = () => {
   const navigate = useNavigate();
-  const [messages, setMessages] = useState<any[]>([]);
+  const { toast } = useToast();
   const [newMessage, setNewMessage] = useState("");
-  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-  const [loading, setLoading] = useState(true);
+  const [userId, setUserId] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchMessages = async () => {
+    const getUser = async () => {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        navigate("/auth");
-        return;
+      if (user) {
+        setUserId(user.id);
       }
-      setCurrentUserId(user.id);
-
-      const { data, error } = await supabase
-        .from("chat_messages")
-        .select("*")
-        .order("created_at", { ascending: true });
-
-      if (error) {
-        toast.error("Erro ao carregar mensagens");
-        return;
-      }
-
-      setMessages(data || []);
-      setLoading(false);
     };
+    getUser();
+  }, []);
 
-    fetchMessages();
+  const { data: messages, refetch } = useQuery({
+    queryKey: ['chat-messages'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('chat_messages')
+        .select('*')
+        .order('created_at', { ascending: false });
 
-    // Subscribe to new messages
+      if (error) throw error;
+      return data as Message[];
+    },
+  });
+
+  const handleSendMessage = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newMessage.trim() || !userId) return;
+
+    try {
+      const { error } = await supabase
+        .from('chat_messages')
+        .insert([{ content: newMessage, user_id: userId }]);
+
+      if (error) throw error;
+
+      setNewMessage("");
+      refetch();
+      toast({
+        description: "Mensagem enviada com sucesso!",
+      });
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        description: "Erro ao enviar mensagem. Tente novamente.",
+      });
+    }
+  };
+
+  useEffect(() => {
     const channel = supabase
-      .channel("chat_messages")
-      .on(
-        "postgres_changes",
-        {
-          event: "INSERT",
-          schema: "public",
-          table: "chat_messages",
-        },
-        (payload) => {
-          setMessages((current) => [...current, payload.new]);
+      .channel('chat_messages')
+      .on('postgres_changes', 
+        { event: 'INSERT', schema: 'public', table: 'chat_messages' },
+        () => {
+          refetch();
         }
       )
       .subscribe();
@@ -60,35 +83,7 @@ const Chat = () => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [navigate]);
-
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newMessage.trim()) return;
-
-    const { error } = await supabase
-      .from("chat_messages")
-      .insert([{ content: newMessage, user_id: currentUserId }]);
-
-    if (error) {
-      toast.error("Erro ao enviar mensagem");
-      return;
-    }
-
-    setNewMessage("");
-  };
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-primary"></div>
-      </div>
-    );
-  }
+  }, [refetch]);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-secondary">
@@ -104,29 +99,28 @@ const Chat = () => {
               <ChevronLeft className="h-5 w-5" />
             </Button>
             <h1 className="text-xl font-semibold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-              Chat da Comunidade
+              Chat de Apostadores
             </h1>
           </div>
         </div>
       </header>
 
-      <main className="container mx-auto px-4 pb-20 pt-4">
-        <div className="space-y-4">
-          {messages.map((message) => (
+      <main className="container mx-auto px-4 pb-24">
+        <div className="space-y-4 mt-4">
+          {messages?.map((message) => (
             <ChatMessage
               key={message.id}
               content={message.content}
-              isCurrentUser={message.user_id === currentUserId}
+              isCurrentUser={message.user_id === userId}
               timestamp={message.created_at}
             />
           ))}
-          <div ref={messagesEndRef} />
         </div>
       </main>
 
-      <footer className="glass fixed bottom-0 left-0 right-0 p-4">
+      <div className="glass fixed bottom-0 left-0 right-0 p-4">
         <div className="container mx-auto">
-          <form onSubmit={handleSubmit} className="flex gap-2">
+          <form onSubmit={handleSendMessage} className="flex gap-2">
             <Input
               type="text"
               placeholder="Digite sua mensagem..."
@@ -134,12 +128,10 @@ const Chat = () => {
               onChange={(e) => setNewMessage(e.target.value)}
               className="flex-1"
             />
-            <Button type="submit" size="icon">
-              <Send className="h-4 w-4" />
-            </Button>
+            <Button type="submit">Enviar</Button>
           </form>
         </div>
-      </footer>
+      </div>
     </div>
   );
 };
