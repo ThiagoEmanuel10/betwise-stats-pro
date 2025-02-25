@@ -106,6 +106,60 @@ export type Database = {
           },
         ]
       }
+      match_comments: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          match_id: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          match_id: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          match_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      match_predictions: {
+        Row: {
+          away_score: number
+          created_at: string
+          home_score: number
+          id: string
+          is_correct: boolean | null
+          match_id: string
+          user_id: string
+        }
+        Insert: {
+          away_score: number
+          created_at?: string
+          home_score: number
+          id?: string
+          is_correct?: boolean | null
+          match_id: string
+          user_id: string
+        }
+        Update: {
+          away_score?: number
+          created_at?: string
+          home_score?: number
+          id?: string
+          is_correct?: boolean | null
+          match_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -130,6 +184,33 @@ export type Database = {
           id?: string
           notification_preferences?: Json | null
           username?: string | null
+        }
+        Relationships: []
+      }
+      user_rankings: {
+        Row: {
+          accuracy_rate: number | null
+          correct_predictions: number | null
+          id: string
+          total_predictions: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          accuracy_rate?: number | null
+          correct_predictions?: number | null
+          id?: string
+          total_predictions?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          accuracy_rate?: number | null
+          correct_predictions?: number | null
+          id?: string
+          total_predictions?: number | null
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
