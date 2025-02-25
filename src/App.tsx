@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import Index from "./pages/Index";
 import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
@@ -47,6 +48,9 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <div className="min-h-screen bg-gradient-to-br from-background via-background to-secondary/20">
+        <div className="fixed top-4 right-4 z-50">
+          <ThemeToggle />
+        </div>
         <Toaster />
         <Sonner />
         <BrowserRouter>

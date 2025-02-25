@@ -7,25 +7,31 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { MatchCard } from "@/components/MatchCard";
+import { AdvancedFilters, type Filters } from "@/components/AdvancedFilters";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 
 const Predictions = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [searchTerm, setSearchTerm] = useState("");
+  const [filters, setFilters] = useState<Filters>({
+    search: "",
+    onlyLive: false,
+    sortBy: "date"
+  });
 
   const { data: matches, isLoading } = useQuery({
-    queryKey: ['matches-predictions'],
+    queryKey: ['matches-predictions', filters],
     queryFn: async () => {
       const { data, error } = await supabase.functions.invoke('football-api', {
         body: {
           endpoint: 'fixtures',
           params: {
-            league: '39', // Premier League
+            league: '39',
             season: '2023',
             from: new Date().toISOString().split('T')[0],
-            to: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // próximos 7 dias
+            to: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+            live: filters.onlyLive ? 'all' : undefined,
           },
         },
       });
@@ -109,11 +115,30 @@ const Predictions = () => {
   };
 
   const filteredMatches = matches?.filter((match) => {
-    const searchLower = searchTerm.toLowerCase();
-    return (
-      match.teams.home.name.toLowerCase().includes(searchLower) ||
-      match.teams.away.name.toLowerCase().includes(searchLower)
-    );
+    if (filters.search) {
+      const searchLower = filters.search.toLowerCase();
+      if (!match.teams.home.name.toLowerCase().includes(searchLower) &&
+          !match.teams.away.name.toLowerCase().includes(searchLower)) {
+        return false;
+      }
+    }
+    
+    if (filters.league && match.league.id.toString() !== filters.league) {
+      return false;
+    }
+    
+    return true;
+  }).sort((a, b) => {
+    switch (filters.sortBy) {
+      case "date":
+        return new Date(a.fixture.date).getTime() - new Date(b.fixture.date).getTime();
+      case "probability":
+        return (b.predictions?.winning_percent || 0) - (a.predictions?.winning_percent || 0);
+      case "popularity":
+        return (b.statistics?.favorites || 0) - (a.statistics?.favorites || 0);
+      default:
+        return 0;
+    }
   });
 
   return (
@@ -143,17 +168,11 @@ const Predictions = () => {
               <MessageSquare className="h-5 w-5" />
             </Button>
           </div>
-          <div className="flex flex-col gap-4">
-            <div className="relative">
-              <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-              <Input
-                type="search"
-                placeholder="Buscar jogos..."
-                className="pl-9"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
+          <div className="space-y-4">
+            <AdvancedFilters
+              filters={filters}
+              onFiltersChange={setFilters}
+            />
           </div>
         </div>
       </header>
