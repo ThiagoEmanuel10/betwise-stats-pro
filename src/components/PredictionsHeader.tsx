@@ -8,9 +8,10 @@ import type { Filters } from "@/components/AdvancedFilters";
 interface PredictionsHeaderProps {
   filters: Filters;
   onFiltersChange: (filters: Filters) => void;
+  leagues: Record<string, string>;
 }
 
-export function PredictionsHeader({ filters, onFiltersChange }: PredictionsHeaderProps) {
+export function PredictionsHeader({ filters, onFiltersChange, leagues }: PredictionsHeaderProps) {
   const navigate = useNavigate();
 
   return (
@@ -43,6 +44,7 @@ export function PredictionsHeader({ filters, onFiltersChange }: PredictionsHeade
           <AdvancedFilters
             filters={filters}
             onFiltersChange={onFiltersChange}
+            leagues={leagues}
           />
         </div>
       </div>

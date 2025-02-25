@@ -12,6 +12,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Filter, SortDesc } from "lucide-react";
+import { LeagueId } from "@/hooks/useMatches";
 
 export type Filters = {
   search: string;
@@ -23,9 +24,10 @@ export type Filters = {
 interface AdvancedFiltersProps {
   filters: Filters;
   onFiltersChange: (filters: Filters) => void;
+  leagues: Record<string, string>;
 }
 
-export function AdvancedFilters({ filters, onFiltersChange }: AdvancedFiltersProps) {
+export function AdvancedFilters({ filters, onFiltersChange, leagues }: AdvancedFiltersProps) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -70,9 +72,11 @@ export function AdvancedFilters({ filters, onFiltersChange }: AdvancedFiltersPro
                 <SelectValue placeholder="Selecione uma liga" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="premier">Premier League</SelectItem>
-                <SelectItem value="laliga">La Liga</SelectItem>
-                <SelectItem value="bundesliga">Bundesliga</SelectItem>
+                {Object.entries(leagues).map(([id, name]) => (
+                  <SelectItem key={id} value={id}>
+                    {name}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>

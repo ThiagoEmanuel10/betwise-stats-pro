@@ -12,13 +12,14 @@ const Predictions = () => {
     sortBy: "date"
   });
 
-  const { matches, isLoading, favoriteMatches, toggleFavorite } = useMatches(filters);
+  const { matches, isLoading, favoriteMatches, toggleFavorite, leagues } = useMatches(filters);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-secondary">
       <PredictionsHeader
         filters={filters}
         onFiltersChange={setFilters}
+        leagues={leagues}
       />
 
       <main className="container mx-auto px-4 pb-8">

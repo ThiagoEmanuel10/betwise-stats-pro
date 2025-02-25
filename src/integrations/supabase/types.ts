@@ -37,6 +37,7 @@ export type Database = {
           home_team: string
           id: string
           league: string
+          league_id: string
           match_date: string
           match_id: string
           user_id: string
@@ -47,6 +48,7 @@ export type Database = {
           home_team: string
           id?: string
           league: string
+          league_id?: string
           match_date: string
           match_id: string
           user_id: string
@@ -57,6 +59,7 @@ export type Database = {
           home_team?: string
           id?: string
           league?: string
+          league_id?: string
           match_date?: string
           match_id?: string
           user_id?: string
@@ -137,6 +140,7 @@ export type Database = {
           home_score: number
           id: string
           is_correct: boolean | null
+          league_id: string
           match_id: string
           user_id: string
         }
@@ -146,6 +150,7 @@ export type Database = {
           home_score: number
           id?: string
           is_correct?: boolean | null
+          league_id?: string
           match_id: string
           user_id: string
         }
@@ -155,6 +160,7 @@ export type Database = {
           home_score?: number
           id?: string
           is_correct?: boolean | null
+          league_id?: string
           match_id?: string
           user_id?: string
         }

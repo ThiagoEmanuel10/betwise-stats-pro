@@ -4,6 +4,18 @@ import { useNavigate } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
+const LEAGUES = {
+  '39': 'Premier League',
+  '71': 'Brasileirão Série A',
+  '140': 'La Liga',
+  '78': 'Bundesliga',
+  '135': 'Serie A',
+  '61': 'Ligue 1',
+  '2': 'Champions League'
+} as const;
+
+export type LeagueId = keyof typeof LEAGUES;
+
 export const useMatches = (filters: {
   search: string;
   onlyLive: boolean;
@@ -20,7 +32,7 @@ export const useMatches = (filters: {
         body: {
           endpoint: 'fixtures',
           params: {
-            league: '39',
+            league: filters.league || '39',
             season: '2023',
             from: new Date().toISOString().split('T')[0],
             to: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
@@ -60,6 +72,7 @@ export const useMatches = (filters: {
     }
 
     const matchId = match.fixture.id.toString();
+    const leagueId = match.league.id.toString();
     const isFavorite = favoriteMatches?.includes(matchId);
 
     if (isFavorite) {
@@ -88,7 +101,8 @@ export const useMatches = (filters: {
           home_team: match.teams.home.name,
           away_team: match.teams.away.name,
           match_date: match.fixture.date,
-          league: 'Premier League',
+          league: LEAGUES[leagueId as LeagueId] || 'Unknown League',
+          league_id: leagueId,
           user_id: session.user.id
         });
 
@@ -138,6 +152,7 @@ export const useMatches = (filters: {
     matches: filteredMatches,
     isLoading,
     favoriteMatches,
-    toggleFavorite
+    toggleFavorite,
+    leagues: LEAGUES
   };
 };
