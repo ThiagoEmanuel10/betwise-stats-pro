@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Bell, User, Shield, Star, Settings } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import type { Database } from "@/integrations/supabase/types";
+import { UserRankings } from "@/components/UserRankings";
 
 type Profile = Database['public']['Tables']['profiles']['Row'];
 
@@ -56,8 +57,8 @@ const Profile = () => {
         </div>
       </header>
 
-      <main className="container mx-auto px-4 pb-8">
-        <div className="glass rounded-lg p-6 mb-6">
+      <main className="container mx-auto px-4 pb-8 space-y-6">
+        <div className="glass rounded-lg p-6">
           <div className="flex items-center gap-4 mb-6">
             <div className="w-16 h-16 rounded-full bg-secondary flex items-center justify-center">
               {profile?.avatar_url ? (
@@ -87,6 +88,8 @@ const Profile = () => {
             </button>
           </div>
         </div>
+
+        <UserRankings />
 
         <div className="glass rounded-lg p-6">
           <h3 className="text-lg font-semibold mb-4">Configurações</h3>
