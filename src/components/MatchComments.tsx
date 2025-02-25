@@ -45,10 +45,25 @@ export function MatchComments({ matchId, isOpen }: MatchCommentsProps) {
     e.preventDefault();
     if (!newComment.trim()) return;
 
+    // Get the current user's session
+    const { data: { session } } = await supabase.auth.getSession();
+    
+    if (!session) {
+      toast({
+        variant: "destructive",
+        description: "Você precisa estar logado para comentar.",
+      });
+      return;
+    }
+
     try {
       const { error } = await supabase
         .from('match_comments')
-        .insert([{ match_id: matchId, content: newComment }]);
+        .insert({
+          match_id: matchId,
+          content: newComment,
+          user_id: session.user.id
+        });
 
       if (error) throw error;
 
@@ -100,3 +115,4 @@ export function MatchComments({ matchId, isOpen }: MatchCommentsProps) {
     </div>
   );
 }
+
