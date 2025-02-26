@@ -23,6 +23,18 @@ const LEAGUES = {
   '2': 'Champions League'
 } as const;
 
+type UserRanking = {
+  id: string;
+  user_id: string;
+  correct_predictions: number;
+  total_predictions: number;
+  accuracy_rate: number;
+  profiles?: {
+    username: string | null;
+    avatar_url: string | null;
+  } | null;
+};
+
 export const UserRankings = () => {
   const [selectedLeague, setSelectedLeague] = useState('39'); // Default to Premier League
 
@@ -44,7 +56,7 @@ export const UserRankings = () => {
     },
   });
 
-  const { data: leaderboard, isLoading: isLoadingLeaderboard } = useQuery({
+  const { data: leaderboard, isLoading: isLoadingLeaderboard } = useQuery<UserRanking[]>({
     queryKey: ['leaderboard', selectedLeague],
     queryFn: async () => {
       const { data, error } = await supabase

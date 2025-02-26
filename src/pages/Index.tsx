@@ -68,7 +68,7 @@ const Index = () => {
           <h2 className="text-2xl font-semibold mb-6 bg-gradient-to-br from-primary to-accent bg-clip-text text-transparent">
             Estatísticas
           </h2>
-          <StatisticsTab />
+          <StatisticsTab league="39" />
         </section>
       </main>
     </div>
