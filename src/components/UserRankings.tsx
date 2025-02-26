@@ -40,7 +40,7 @@ type UserRanking = {
 };
 
 export const UserRankings = () => {
-  const [selectedLeague, setSelectedLeague] = useState<'39' | '71' | '140' | '78' | '135' | '61' | '2'>('39');
+  const [selectedLeague, setSelectedLeague] = useState<keyof typeof LEAGUES>('39');
 
   const { data: userRanking, isLoading: isLoadingUserRanking } = useQuery({
     queryKey: ['user-ranking', selectedLeague],
@@ -74,7 +74,7 @@ export const UserRankings = () => {
         .limit(10);
 
       if (error) throw error;
-      return data as UserRanking[];
+      return data;
     },
   });
 
@@ -162,7 +162,7 @@ export const UserRankings = () => {
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>Global Leaderboard</CardTitle>
           <span className="text-sm text-muted-foreground">
-            {LEAGUES[selectedLeague as keyof typeof LEAGUES]}
+            {LEAGUES[selectedLeague]}
           </span>
         </CardHeader>
         <CardContent>
