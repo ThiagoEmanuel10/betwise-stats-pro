@@ -4,10 +4,30 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Trophy, Target, Percent } from "lucide-react";
 import { StatisticsTab } from "@/components/StatisticsTab";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useState } from "react";
+
+const LEAGUES = {
+  '39': 'Premier League',
+  '71': 'Brasileirão Série A',
+  '140': 'La Liga',
+  '78': 'Bundesliga',
+  '135': 'Serie A',
+  '61': 'Ligue 1',
+  '2': 'Champions League'
+};
 
 export const UserRankings = () => {
+  const [selectedLeague, setSelectedLeague] = useState('39'); // Default to Premier League
+
   const { data: userRanking, isLoading: isLoadingUserRanking } = useQuery({
-    queryKey: ['user-ranking'],
+    queryKey: ['user-ranking', selectedLeague],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return null;
@@ -16,6 +36,7 @@ export const UserRankings = () => {
         .from('user_rankings')
         .select('*')
         .eq('user_id', user.id)
+        .eq('league_id', selectedLeague)
         .maybeSingle();
 
       if (error) throw error;
@@ -24,7 +45,7 @@ export const UserRankings = () => {
   });
 
   const { data: leaderboard, isLoading: isLoadingLeaderboard } = useQuery({
-    queryKey: ['leaderboard'],
+    queryKey: ['leaderboard', selectedLeague],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('user_rankings')
@@ -35,6 +56,7 @@ export const UserRankings = () => {
             avatar_url
           )
         `)
+        .eq('league_id', selectedLeague)
         .order('accuracy_rate', { ascending: false })
         .limit(10);
 
@@ -54,6 +76,24 @@ export const UserRankings = () => {
 
   return (
     <div className="space-y-6">
+      <div className="flex justify-end">
+        <Select
+          value={selectedLeague}
+          onValueChange={setSelectedLeague}
+        >
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Select League" />
+          </SelectTrigger>
+          <SelectContent>
+            {Object.entries(LEAGUES).map(([id, name]) => (
+              <SelectItem key={id} value={id}>
+                {name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card className="glass">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -101,13 +141,16 @@ export const UserRankings = () => {
           <CardTitle>Statistics</CardTitle>
         </CardHeader>
         <CardContent>
-          <StatisticsTab />
+          <StatisticsTab league={selectedLeague} />
         </CardContent>
       </Card>
 
       <Card className="glass">
-        <CardHeader>
+        <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>Global Leaderboard</CardTitle>
+          <span className="text-sm text-muted-foreground">
+            {LEAGUES[selectedLeague as keyof typeof LEAGUES]}
+          </span>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
