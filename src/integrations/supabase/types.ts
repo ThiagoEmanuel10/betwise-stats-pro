@@ -198,6 +198,7 @@ export type Database = {
           accuracy_rate: number | null
           correct_predictions: number | null
           id: string
+          league_id: string
           total_predictions: number | null
           updated_at: string
           user_id: string
@@ -206,6 +207,7 @@ export type Database = {
           accuracy_rate?: number | null
           correct_predictions?: number | null
           id?: string
+          league_id?: string
           total_predictions?: number | null
           updated_at?: string
           user_id: string
@@ -214,6 +216,7 @@ export type Database = {
           accuracy_rate?: number | null
           correct_predictions?: number | null
           id?: string
+          league_id?: string
           total_predictions?: number | null
           updated_at?: string
           user_id?: string
