@@ -21,7 +21,7 @@ const LEAGUES = {
   '135': 'Serie A',
   '61': 'Ligue 1',
   '2': 'Champions League'
-};
+} as const;
 
 export const UserRankings = () => {
   const [selectedLeague, setSelectedLeague] = useState('39'); // Default to Premier League
@@ -51,7 +51,7 @@ export const UserRankings = () => {
         .from('user_rankings')
         .select(`
           *,
-          profiles (
+          profiles:user_id (
             username,
             avatar_url
           )
@@ -183,4 +183,3 @@ export const UserRankings = () => {
     </div>
   );
 };
-
