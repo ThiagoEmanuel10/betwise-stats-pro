@@ -23,20 +23,24 @@ const LEAGUES = {
   '2': 'Champions League'
 } as const;
 
+type Profile = {
+  username: string | null;
+  avatar_url: string | null;
+}
+
 type UserRanking = {
   id: string;
   user_id: string;
-  correct_predictions: number;
-  total_predictions: number;
-  accuracy_rate: number;
-  profiles?: {
-    username: string | null;
-    avatar_url: string | null;
-  } | null;
+  correct_predictions: number | null;
+  total_predictions: number | null;
+  accuracy_rate: number | null;
+  league_id: string;
+  updated_at: string;
+  profiles: Profile | null;
 };
 
 export const UserRankings = () => {
-  const [selectedLeague, setSelectedLeague] = useState('39'); // Default to Premier League
+  const [selectedLeague, setSelectedLeague] = useState<'39' | '71' | '140' | '78' | '135' | '61' | '2'>('39');
 
   const { data: userRanking, isLoading: isLoadingUserRanking } = useQuery({
     queryKey: ['user-ranking', selectedLeague],
@@ -63,17 +67,14 @@ export const UserRankings = () => {
         .from('user_rankings')
         .select(`
           *,
-          profiles:user_id (
-            username,
-            avatar_url
-          )
+          profiles:user_id ( username, avatar_url )
         `)
         .eq('league_id', selectedLeague)
         .order('accuracy_rate', { ascending: false })
         .limit(10);
 
       if (error) throw error;
-      return data;
+      return data as UserRanking[];
     },
   });
 
@@ -91,7 +92,7 @@ export const UserRankings = () => {
       <div className="flex justify-end">
         <Select
           value={selectedLeague}
-          onValueChange={setSelectedLeague}
+          onValueChange={(value) => setSelectedLeague(value as keyof typeof LEAGUES)}
         >
           <SelectTrigger className="w-[180px]">
             <SelectValue placeholder="Select League" />
@@ -180,12 +181,12 @@ export const UserRankings = () => {
                       {rank.profiles?.username || "Anonymous"}
                     </p>
                     <p className="text-sm text-muted-foreground">
-                      {rank.correct_predictions} / {rank.total_predictions} correct
+                      {rank.correct_predictions || 0} / {rank.total_predictions || 0} correct
                     </p>
                   </div>
                 </div>
                 <div className="text-lg font-bold text-accent">
-                  {rank.accuracy_rate?.toFixed(1)}%
+                  {rank.accuracy_rate?.toFixed(1) || "0.0"}%
                 </div>
               </div>
             ))}
