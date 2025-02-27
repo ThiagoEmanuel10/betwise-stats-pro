@@ -2,7 +2,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Trophy, Target, Percent } from "lucide-react";
+import { Trophy, Target, Percent, Brain, TrendingUp, Sparkles } from "lucide-react";
 import { StatisticsTab } from "@/components/StatisticsTab";
 import {
   Select,
@@ -12,6 +12,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/components/ui/use-toast";
+import { useNavigate } from "react-router-dom";
 
 const LEAGUES = {
   '39': 'Premier League',
@@ -39,8 +42,20 @@ type UserRanking = {
   profiles: Profile | null;
 };
 
+type InsightType = "strength" | "improvement" | "pattern" | "recommendation";
+
+type Insight = {
+  type: InsightType;
+  title: string;
+  description: string;
+  icon: React.ReactNode;
+  action?: string;
+};
+
 export const UserRankings = () => {
   const [selectedLeague, setSelectedLeague] = useState<keyof typeof LEAGUES>('39');
+  const { toast } = useToast();
+  const navigate = useNavigate();
 
   const { data: userRanking, isLoading: isLoadingUserRanking } = useQuery({
     queryKey: ['user-ranking', selectedLeague],
@@ -54,6 +69,25 @@ export const UserRankings = () => {
         .eq('user_id', user.id)
         .eq('league_id', selectedLeague)
         .maybeSingle();
+
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const { data: userPredictions, isLoading: isLoadingPredictions } = useQuery({
+    queryKey: ['user-predictions', selectedLeague],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return null;
+
+      const { data, error } = await supabase
+        .from('match_predictions')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('league_id', selectedLeague)
+        .order('created_at', { ascending: false })
+        .limit(50);
 
       if (error) throw error;
       return data;
@@ -74,11 +108,140 @@ export const UserRankings = () => {
         .limit(10);
 
       if (error) throw error;
-      return data as UserRanking[];
+      return data as unknown as UserRanking[];
     },
   });
 
-  if (isLoadingUserRanking || isLoadingLeaderboard) {
+  // Generate AI insights based on user's prediction history
+  const generateInsights = (): Insight[] => {
+    if (!userPredictions || userPredictions.length === 0 || !userRanking) {
+      return [{
+        type: "recommendation",
+        title: "Start Making Predictions",
+        description: "Make your first predictions to receive personalized insights.",
+        icon: <Sparkles className="h-6 w-6 text-accent" />,
+        action: "Predict Now"
+      }];
+    }
+
+    const insights: Insight[] = [];
+    
+    // Calculate various metrics from prediction history
+    const correctPredictions = userPredictions.filter(p => p.is_correct).length;
+    const totalPredictions = userPredictions.length;
+    const accuracy = (correctPredictions / totalPredictions) * 100;
+    
+    // Get recent predictions (last 10)
+    const recentPredictions = userPredictions.slice(0, 10);
+    const recentCorrect = recentPredictions.filter(p => p.is_correct).length;
+    const recentAccuracy = (recentCorrect / recentPredictions.length) * 100;
+    
+    // Calculate home vs away prediction success
+    const homePredictions = userPredictions.filter(p => p.home_score > p.away_score);
+    const awayPredictions = userPredictions.filter(p => p.home_score < p.away_score);
+    const drawPredictions = userPredictions.filter(p => p.home_score === p.away_score);
+    
+    const homeCorrect = homePredictions.filter(p => p.is_correct).length;
+    const awayCorrect = awayPredictions.filter(p => p.is_correct).length;
+    const drawCorrect = drawPredictions.filter(p => p.is_correct).length;
+    
+    const homeAccuracy = homePredictions.length > 0 ? (homeCorrect / homePredictions.length) * 100 : 0;
+    const awayAccuracy = awayPredictions.length > 0 ? (awayCorrect / awayPredictions.length) * 100 : 0;
+    const drawAccuracy = drawPredictions.length > 0 ? (drawCorrect / drawPredictions.length) * 100 : 0;
+    
+    // Identify user's strengths
+    if (homeAccuracy > awayAccuracy && homeAccuracy > drawAccuracy && homePredictions.length >= 3) {
+      insights.push({
+        type: "strength",
+        title: "Home Win Prediction Expert",
+        description: `You're particularly good at predicting home team wins with ${homeAccuracy.toFixed(1)}% accuracy.`,
+        icon: <Trophy className="h-6 w-6 text-primary" />
+      });
+    } else if (awayAccuracy > homeAccuracy && awayAccuracy > drawAccuracy && awayPredictions.length >= 3) {
+      insights.push({
+        type: "strength",
+        title: "Away Win Prediction Expert",
+        description: `You excel at predicting away team wins with ${awayAccuracy.toFixed(1)}% accuracy.`,
+        icon: <Trophy className="h-6 w-6 text-primary" />
+      });
+    } else if (drawAccuracy > homeAccuracy && drawAccuracy > awayAccuracy && drawPredictions.length >= 3) {
+      insights.push({
+        type: "strength",
+        title: "Draw Prediction Expert",
+        description: `You have a talent for predicting draws with ${drawAccuracy.toFixed(1)}% accuracy.`,
+        icon: <Trophy className="h-6 w-6 text-primary" />
+      });
+    }
+    
+    // Recent performance insights
+    if (recentAccuracy > accuracy + 10) {
+      insights.push({
+        type: "pattern",
+        title: "Improving Prediction Accuracy",
+        description: `Your recent predictions have been ${(recentAccuracy - accuracy).toFixed(1)}% more accurate than your overall average.`,
+        icon: <TrendingUp className="h-6 w-6 text-green-500" />
+      });
+    } else if (accuracy > recentAccuracy + 10) {
+      insights.push({
+        type: "improvement",
+        title: "Recent Accuracy Declining",
+        description: `Your recent predictions have been ${(accuracy - recentAccuracy).toFixed(1)}% less accurate than your overall average.`,
+        icon: <TrendingUp className="h-6 w-6 text-red-500" />
+      });
+    }
+    
+    // Add personalized recommendations
+    if (totalPredictions < 20) {
+      insights.push({
+        type: "recommendation",
+        title: "Make More Predictions",
+        description: "Increase your prediction volume to improve AI insights accuracy.",
+        icon: <Brain className="h-6 w-6 text-accent" />,
+        action: "Predict Now"
+      });
+    } else if (accuracy < 45) {
+      insights.push({
+        type: "recommendation",
+        title: "Review Statistics",
+        description: "Analyze team statistics more carefully before making predictions.",
+        icon: <Brain className="h-6 w-6 text-accent" />,
+        action: "View Stats"
+      });
+    } else if (leaderboard && leaderboard.length > 0 && accuracy < (leaderboard[0].accuracy_rate || 0) - 15) {
+      insights.push({
+        type: "recommendation",
+        title: "Study Top Predictors",
+        description: "Your accuracy is significantly below the leaderboard. Check high probability matches.",
+        icon: <Brain className="h-6 w-6 text-accent" />,
+        action: "View High Probability"
+      });
+    }
+    
+    // If we don't have enough insights, add a generic one
+    if (insights.length < 2) {
+      insights.push({
+        type: "pattern",
+        title: "Pattern Analysis",
+        description: `Based on your history, you have a ${accuracy.toFixed(1)}% overall prediction accuracy.`,
+        icon: <Brain className="h-6 w-6 text-accent" />
+      });
+    }
+    
+    return insights;
+  };
+
+  const handleInsightAction = (action?: string) => {
+    if (action === "Predict Now") {
+      navigate('/predictions');
+    } else if (action === "View Stats") {
+      // Scroll to statistics section
+      document.getElementById('statistics-section')?.scrollIntoView({ behavior: 'smooth' });
+    } else if (action === "View High Probability") {
+      navigate('/high-probability');
+    }
+  };
+
+  if (isLoadingUserRanking || isLoadingLeaderboard || isLoadingPredictions) {
     return (
       <div className="space-y-4">
         <div className="h-32 glass animate-pulse rounded-lg"></div>
@@ -86,6 +249,8 @@ export const UserRankings = () => {
       </div>
     );
   }
+
+  const insights = generateInsights();
 
   return (
     <div className="space-y-6">
@@ -149,7 +314,52 @@ export const UserRankings = () => {
         </Card>
       </div>
 
+      {/* AI Insights Section */}
       <Card className="glass">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Brain className="h-5 w-5 text-accent" /> AI Powered Insights
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {insights.map((insight, index) => (
+              <Card key={index} className={`bg-secondary/30 border-l-4 ${
+                insight.type === "strength" ? "border-l-primary" :
+                insight.type === "improvement" ? "border-l-red-500" :
+                insight.type === "pattern" ? "border-l-blue-500" :
+                "border-l-accent"
+              }`}>
+                <CardHeader className="flex flex-row items-start gap-3 pb-2">
+                  <div className="mt-1">
+                    {insight.icon}
+                  </div>
+                  <div>
+                    <CardTitle className="text-base">{insight.title}</CardTitle>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      {insight.description}
+                    </p>
+                  </div>
+                </CardHeader>
+                {insight.action && (
+                  <CardContent className="pt-0">
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="mt-2"
+                      onClick={() => handleInsightAction(insight.action)}
+                    >
+                      {insight.action}
+                    </Button>
+                  </CardContent>
+                )}
+              </Card>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card className="glass" id="statistics-section">
         <CardHeader>
           <CardTitle>Statistics</CardTitle>
         </CardHeader>
