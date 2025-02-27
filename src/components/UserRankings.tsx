@@ -67,14 +67,14 @@ export const UserRankings = () => {
         .from('user_rankings')
         .select(`
           *,
-          profiles:user_id ( username, avatar_url )
+          profiles:user_id(username, avatar_url)
         `)
         .eq('league_id', selectedLeague)
         .order('accuracy_rate', { ascending: false })
         .limit(10);
 
       if (error) throw error;
-      return data;
+      return data as UserRanking[];
     },
   });
 
@@ -167,7 +167,7 @@ export const UserRankings = () => {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {leaderboard?.map((rank, index) => (
+            {leaderboard && leaderboard.map((rank, index) => (
               <div
                 key={rank.id}
                 className="flex items-center justify-between p-4 rounded-lg bg-secondary/50"
