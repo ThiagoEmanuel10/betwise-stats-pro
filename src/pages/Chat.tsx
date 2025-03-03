@@ -1,13 +1,15 @@
 
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, Football } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ChatMessage } from "@/components/ChatMessage";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
+import { LiveMatchDisplay } from "@/components/LiveMatchDisplay";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface Message {
   id: string;
@@ -21,6 +23,7 @@ const Chat = () => {
   const { toast } = useToast();
   const [newMessage, setNewMessage] = useState("");
   const [userId, setUserId] = useState<string | null>(null);
+  const [selectedMatchId, setSelectedMatchId] = useState<string | undefined>(undefined);
 
   useEffect(() => {
     const getUser = async () => {
@@ -43,6 +46,24 @@ const Chat = () => {
       if (error) throw error;
       return data as Message[];
     },
+  });
+
+  const { data: liveMatches, isLoading: isLoadingMatches } = useQuery({
+    queryKey: ['live-matches'],
+    queryFn: async () => {
+      const { data, error } = await supabase.functions.invoke('football-api', {
+        body: {
+          endpoint: 'fixtures',
+          params: {
+            live: 'all'
+          },
+        },
+      });
+
+      if (error) throw error;
+      return data.response || [];
+    },
+    refetchInterval: 60000, // Atualiza a cada minuto
   });
 
   const handleSendMessage = async (e: React.FormEvent) => {
@@ -106,7 +127,39 @@ const Chat = () => {
       </header>
 
       <main className="container mx-auto px-4 pb-24">
-        <div className="space-y-4 mt-4">
+        <div className="mt-4 mb-6">
+          <div className="flex items-center gap-2 mb-2">
+            <Football className="h-4 w-4 text-primary" />
+            <h2 className="text-sm font-medium">Jogo em destaque</h2>
+          </div>
+          
+          {isLoadingMatches ? (
+            <div className="h-24 animate-pulse rounded-lg bg-secondary/30"></div>
+          ) : (
+            <>
+              <div className="mb-2">
+                <Select
+                  value={selectedMatchId}
+                  onValueChange={(value) => setSelectedMatchId(value)}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Selecione um jogo para acompanhar" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {liveMatches?.map((match: any) => (
+                      <SelectItem key={match.fixture.id} value={match.fixture.id.toString()}>
+                        {match.teams.home.name} vs {match.teams.away.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <LiveMatchDisplay matchId={selectedMatchId} />
+            </>
+          )}
+        </div>
+
+        <div className="space-y-4">
           {messages?.map((message) => (
             <ChatMessage
               key={message.id}
