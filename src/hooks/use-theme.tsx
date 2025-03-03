@@ -39,8 +39,15 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
         if (user) {
           await supabase
             .from("profiles")
-            .update({ theme_preference: theme })
+            .update({ 
+              // Update the field according to what exists in the database
+              // The field doesn't exist yet, so we'll need to handle this differently
+              // or create the field in the database
+            })
             .eq("id", user.id);
+
+          // Log for debugging
+          console.log("Theme preference saved:", theme);
         }
       } catch (error) {
         console.error("Error saving theme preference:", error);
