@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { ChevronLeft, Football } from "lucide-react";
+import { ChevronLeft, Trophy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ChatMessage } from "@/components/ChatMessage";
@@ -129,7 +129,7 @@ const Chat = () => {
       <main className="container mx-auto px-4 pb-24">
         <div className="mt-4 mb-6">
           <div className="flex items-center gap-2 mb-2">
-            <Football className="h-4 w-4 text-primary" />
+            <Trophy className="h-4 w-4 text-primary" />
             <h2 className="text-sm font-medium">Jogo em destaque</h2>
           </div>
           
