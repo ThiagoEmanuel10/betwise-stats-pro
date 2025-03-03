@@ -1,6 +1,7 @@
 
 import { useEffect, useState, createContext, useContext } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 type Theme = "light" | "dark";
 
@@ -37,17 +38,18 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
       try {
         const { data: { user } } = await supabase.auth.getUser();
         if (user) {
-          await supabase
+          const { error } = await supabase
             .from("profiles")
             .update({ 
-              // Update the field according to what exists in the database
-              // The field doesn't exist yet, so we'll need to handle this differently
-              // or create the field in the database
+              theme_preference: theme
             })
             .eq("id", user.id);
 
-          // Log for debugging
-          console.log("Theme preference saved:", theme);
+          if (error) {
+            console.error("Error saving theme preference:", error);
+          } else {
+            console.log("Theme preference saved:", theme);
+          }
         }
       } catch (error) {
         console.error("Error saving theme preference:", error);
