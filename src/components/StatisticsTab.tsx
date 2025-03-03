@@ -6,6 +6,10 @@ import { useStatistics } from "./statistics/useStatistics";
 import { AccuracyRateChart } from "./statistics/AccuracyRateChart";
 import { PredictionsCountChart } from "./statistics/PredictionsCountChart";
 import { CombinedChart } from "./statistics/CombinedChart";
+import { LeaguePerformanceTab } from "./statistics/LeaguePerformanceTab";
+import { HeadToHeadTab } from "./statistics/HeadToHeadTab";
+import { ResultTrendsTab } from "./statistics/ResultTrendsTab";
+import { HomeAwayAnalysisTab } from "./statistics/HomeAwayAnalysisTab";
 import { TimeFilter } from "./statistics/types";
 
 interface StatisticsTabProps {
@@ -28,10 +32,14 @@ export const StatisticsTab = ({ league }: StatisticsTabProps) => {
       </div>
 
       <Tabs defaultValue="accuracy">
-        <TabsList className="grid grid-cols-3 mb-4">
+        <TabsList className="grid grid-cols-7 mb-4">
           <TabsTrigger value="accuracy">Accuracy Rate</TabsTrigger>
           <TabsTrigger value="predictions">Predictions Count</TabsTrigger>
           <TabsTrigger value="combined">Combined View</TabsTrigger>
+          <TabsTrigger value="league">League Stats</TabsTrigger>
+          <TabsTrigger value="h2h">Head to Head</TabsTrigger>
+          <TabsTrigger value="trends">Result Trends</TabsTrigger>
+          <TabsTrigger value="homeaway">Home/Away Analysis</TabsTrigger>
         </TabsList>
 
         <TabsContent value="accuracy" className="h-[400px]">
@@ -44,6 +52,22 @@ export const StatisticsTab = ({ league }: StatisticsTabProps) => {
 
         <TabsContent value="combined" className="h-[400px]">
           <CombinedChart data={predictionStats || []} />
+        </TabsContent>
+
+        <TabsContent value="league" className="h-[400px]">
+          <LeaguePerformanceTab leagueId={league} timeFilter={timeFilter} />
+        </TabsContent>
+
+        <TabsContent value="h2h" className="h-[400px]">
+          <HeadToHeadTab leagueId={league} />
+        </TabsContent>
+
+        <TabsContent value="trends" className="h-[400px]">
+          <ResultTrendsTab leagueId={league} timeFilter={timeFilter} />
+        </TabsContent>
+
+        <TabsContent value="homeaway" className="h-[400px]">
+          <HomeAwayAnalysisTab leagueId={league} timeFilter={timeFilter} />
         </TabsContent>
       </Tabs>
     </div>
