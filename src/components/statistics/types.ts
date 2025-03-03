@@ -44,3 +44,14 @@ export type ResultTrend = {
   draws: number;
   totalMatches: number;
 };
+
+export type ChartType = "line" | "bar" | "area";
+
+export type ColorScheme = "default" | "blue" | "green" | "purple";
+
+export type DataVisualizationPreferences = {
+  chartType: ChartType;
+  colorScheme: ColorScheme;
+  showLegend: boolean;
+  showGrid: boolean;
+};

@@ -41,3 +41,41 @@ export const sortByDate = <T extends { date: string }>(data: T[]): T[] => {
   );
 };
 
+export const getColorSchemeForChart = (
+  colorScheme: string, 
+  type: "primary" | "secondary" | "tertiary" = "primary"
+) => {
+  switch (colorScheme) {
+    case "blue":
+      return type === "primary" ? "#0ea5e9" : 
+             type === "secondary" ? "#38bdf8" : "#7dd3fc";
+    case "green":
+      return type === "primary" ? "#22c55e" : 
+             type === "secondary" ? "#4ade80" : "#86efac";
+    case "purple":
+      return type === "primary" ? "#8b5cf6" : 
+             type === "secondary" ? "#a78bfa" : "#c4b5fd";
+    default:
+      // Default colors
+      return type === "primary" ? "#3b82f6" : 
+             type === "secondary" ? "#f87171" : "#facc15";
+  }
+};
+
+export const getChartConfig = (preferences: {
+  chartType: string;
+  colorScheme: string;
+  showLegend: boolean;
+  showGrid: boolean;
+}) => {
+  return {
+    type: preferences.chartType,
+    colors: {
+      primary: getColorSchemeForChart(preferences.colorScheme, "primary"),
+      secondary: getColorSchemeForChart(preferences.colorScheme, "secondary"),
+      tertiary: getColorSchemeForChart(preferences.colorScheme, "tertiary"),
+    },
+    legend: preferences.showLegend,
+    grid: preferences.showGrid,
+  };
+};

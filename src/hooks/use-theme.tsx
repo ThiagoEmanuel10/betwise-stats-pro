@@ -1,9 +1,20 @@
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, createContext, useContext } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 type Theme = "light" | "dark";
 
-export const useTheme = () => {
+type ThemeContextType = {
+  theme: Theme;
+  toggleTheme: () => void;
+};
+
+const ThemeContext = createContext<ThemeContextType>({
+  theme: "light",
+  toggleTheme: () => {},
+});
+
+export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
   const [theme, setTheme] = useState<Theme>(() => {
     if (typeof window !== "undefined") {
       const stored = localStorage.getItem("theme") as Theme;
@@ -20,11 +31,40 @@ export const useTheme = () => {
     root.classList.remove("light", "dark");
     root.classList.add(theme);
     localStorage.setItem("theme", theme);
+    
+    // Save to user profile if logged in
+    const saveThemePreference = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          await supabase
+            .from("profiles")
+            .update({ theme_preference: theme })
+            .eq("id", user.id);
+        }
+      } catch (error) {
+        console.error("Error saving theme preference:", error);
+      }
+    };
+    
+    saveThemePreference();
   }, [theme]);
 
   const toggleTheme = () => {
     setTheme((prev) => (prev === "light" ? "dark" : "light"));
   };
 
-  return { theme, toggleTheme };
+  return (
+    <ThemeContext.Provider value={{ theme, toggleTheme }}>
+      {children}
+    </ThemeContext.Provider>
+  );
+};
+
+export const useTheme = () => {
+  const context = useContext(ThemeContext);
+  if (context === undefined) {
+    throw new Error("useTheme must be used within a ThemeProvider");
+  }
+  return context;
 };
