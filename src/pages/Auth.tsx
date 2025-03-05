@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { Mail, Lock, User, ArrowLeft, Google } from "lucide-react";
+import { Mail, Lock, User, ArrowLeft } from "lucide-react";
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -128,6 +128,13 @@ const Auth = () => {
     );
   }
 
+  // Check if user is a new sign-up and completed registration
+  const isNewUser = searchParams.get("newUser") === "true";
+  
+  if (isNewUser) {
+    return <OnboardingScreen navigate={navigate} />;
+  }
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-background to-secondary p-4">
       <div className="w-full max-w-md">
@@ -162,7 +169,7 @@ const Auth = () => {
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4">
-              {mode !== "forgotPassword" && mode === "signup" && (
+              {mode === "signup" && (
                 <>
                   <div className="space-y-2">
                     <Label htmlFor="username">Nome de usuário</Label>
@@ -274,10 +281,20 @@ const Auth = () => {
                   <Button
                     type="button"
                     variant="outline"
-                    className="w-full flex items-center justify-center"
+                    className="w-full flex items-center justify-center gap-2"
                     onClick={handleGoogleLogin}
                   >
-                    <Google className="h-4 w-4 mr-2" />
+                    <svg 
+                      xmlns="http://www.w3.org/2000/svg" 
+                      viewBox="0 0 24 24" 
+                      width="16" 
+                      height="16"
+                    >
+                      <path fill="#EA4335" d="M12 5c1.6 0 3 .5 4.1 1.4l3.1-3.1C17.1 1.2 14.7 0 12 0S6.9 1.2 4.8 3.3l3.1 3.1C9 5.5 10.4 5 12 5z"/>
+                      <path fill="#4285F4" d="M23.5 12c0-.8-.1-1.7-.2-2.5H12v5h6.5c-.3 1.5-1.2 2.8-2.5 3.7l3.2 2.5c1.9-1.8 3-4.3 3-7.3z"/>
+                      <path fill="#FBBC05" d="M5 12c0-1 .2-1.9.5-2.8L2.4 6.2C1.5 7.9 1 9.9 1 12c0 2.1.5 4.1 1.4 5.8l3.1-3.1C5.2 13.9 5 13 5 12z"/>
+                      <path fill="#34A853" d="M12 19c-1.6 0-3-.5-4.1-1.4l-3.1 3.1c2.1 2.1 4.5 3.3 7.2 3.3 2.7 0 5-.9 6.7-2.5l-3.2-2.5c-1 .7-2.3 1-3.5 1z"/>
+                    </svg>
                     Continuar com Google
                   </Button>
                 </>
@@ -297,6 +314,84 @@ const Auth = () => {
               </button>
             </div>
           )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Onboarding screen for new users
+const OnboardingScreen = ({ navigate }: { navigate: (path: string) => void }) => {
+  const [currentStep, setCurrentStep] = useState(0);
+  
+  const steps = [
+    {
+      title: "Bem-vindo ao BetWise Stats Pro!",
+      description: "Acompanhe jogos ao vivo, faça previsões e interaja com outros fãs.",
+      icon: "🎮"
+    },
+    {
+      title: "Faça previsões inteligentes",
+      description: "Use nossas estatísticas e análises para tomar decisões mais informadas.",
+      icon: "📊"
+    },
+    {
+      title: "Interaja com a comunidade",
+      description: "Discuta jogos em tempo real e compartilhe suas opiniões.",
+      icon: "💬"
+    },
+    {
+      title: "Pronto para começar!",
+      description: "Personalize seu perfil e comece a acompanhar seus jogos favoritos.",
+      icon: "🚀"
+    }
+  ];
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-background to-secondary p-4">
+      <div className="w-full max-w-md slide-up">
+        <div className="glass rounded-lg p-8">
+          <div className="flex flex-col items-center text-center space-y-4">
+            <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center text-4xl">
+              {steps[currentStep].icon}
+            </div>
+            <h2 className="text-2xl font-bold mt-4">{steps[currentStep].title}</h2>
+            <p className="text-muted-foreground">{steps[currentStep].description}</p>
+            
+            <div className="flex justify-center space-x-2 mt-4">
+              {steps.map((_, index) => (
+                <div 
+                  key={index}
+                  className={`w-2 h-2 rounded-full transition-colors ${
+                    index === currentStep ? "bg-primary" : "bg-muted"
+                  }`}
+                />
+              ))}
+            </div>
+            
+            <div className="flex justify-between w-full mt-8">
+              <Button
+                variant="outline"
+                onClick={() => currentStep > 0 ? setCurrentStep(currentStep - 1) : navigate("/auth")}
+                className="px-4"
+              >
+                {currentStep === 0 ? "Voltar" : "Anterior"}
+              </Button>
+              
+              <Button
+                onClick={() => {
+                  if (currentStep < steps.length - 1) {
+                    setCurrentStep(currentStep + 1);
+                  } else {
+                    navigate("/profile");
+                  }
+                }}
+                className="px-4"
+              >
+                {currentStep === steps.length - 1 ? "Começar" : "Próximo"}
+              </Button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
