@@ -17,6 +17,7 @@ import Predictions from "./pages/Predictions";
 import HighProbabilityMatches from "./pages/HighProbabilityMatches";
 import Chat from "./pages/Chat";
 import SubscriptionPlans from "./pages/Subscription";
+import Dashboard from "./pages/Dashboard";
 
 const queryClient = new QueryClient();
 
@@ -63,6 +64,7 @@ const App = () => (
               <Route path="/predictions" element={<Predictions />} />
               <Route path="/high-probability" element={<HighProbabilityMatches />} />
               <Route path="/subscription" element={<SubscriptionPlans />} />
+              <Route path="/dashboard" element={<Dashboard />} />
               <Route
                 path="/chat"
                 element={

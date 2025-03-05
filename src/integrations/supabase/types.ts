@@ -170,25 +170,31 @@ export type Database = {
         Row: {
           avatar_url: string | null
           created_at: string
+          data_visualization_preferences: Json | null
           full_name: string | null
           id: string
           notification_preferences: Json | null
+          theme_preference: string | null
           username: string | null
         }
         Insert: {
           avatar_url?: string | null
           created_at?: string
+          data_visualization_preferences?: Json | null
           full_name?: string | null
           id: string
           notification_preferences?: Json | null
+          theme_preference?: string | null
           username?: string | null
         }
         Update: {
           avatar_url?: string | null
           created_at?: string
+          data_visualization_preferences?: Json | null
           full_name?: string | null
           id?: string
           notification_preferences?: Json | null
+          theme_preference?: string | null
           username?: string | null
         }
         Relationships: []
