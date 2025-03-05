@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { ChevronLeft, Trophy } from "lucide-react";
+import { ChevronLeft, Trophy, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ChatMessage } from "@/components/ChatMessage";
@@ -9,7 +9,20 @@ import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { LiveMatchDisplay } from "@/components/LiveMatchDisplay";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { MatchComments } from "@/components/MatchComments";
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from "@/components/ui/select";
+import { 
+  Tabs, 
+  TabsContent, 
+  TabsList, 
+  TabsTrigger 
+} from "@/components/ui/tabs";
 
 interface Message {
   id: string;
@@ -24,6 +37,7 @@ const Chat = () => {
   const [newMessage, setNewMessage] = useState("");
   const [userId, setUserId] = useState<string | null>(null);
   const [selectedMatchId, setSelectedMatchId] = useState<string | undefined>(undefined);
+  const [activeTab, setActiveTab] = useState("chat");
 
   useEffect(() => {
     const getUser = async () => {
@@ -140,7 +154,12 @@ const Chat = () => {
               <div className="mb-2">
                 <Select
                   value={selectedMatchId}
-                  onValueChange={(value) => setSelectedMatchId(value)}
+                  onValueChange={(value) => {
+                    setSelectedMatchId(value);
+                    if (value) {
+                      setActiveTab("match");
+                    }
+                  }}
                 >
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder="Selecione um jogo para acompanhar" />
@@ -154,35 +173,66 @@ const Chat = () => {
                   </SelectContent>
                 </Select>
               </div>
-              <LiveMatchDisplay matchId={selectedMatchId} />
+              {selectedMatchId && <LiveMatchDisplay matchId={selectedMatchId} />}
             </>
           )}
         </div>
 
-        <div className="space-y-4">
-          {messages?.map((message) => (
-            <ChatMessage
-              key={message.id}
-              content={message.content}
-              isCurrentUser={message.user_id === userId}
-              timestamp={message.created_at}
+        <Tabs 
+          defaultValue="chat" 
+          value={activeTab} 
+          onValueChange={setActiveTab}
+          className="w-full"
+        >
+          <TabsList className="grid w-full grid-cols-2 mb-4">
+            <TabsTrigger value="chat" className="flex items-center gap-1">
+              <MessageCircle className="h-4 w-4" />
+              Chat Geral
+            </TabsTrigger>
+            <TabsTrigger 
+              value="match" 
+              disabled={!selectedMatchId}
+              className="flex items-center gap-1"
+            >
+              <Trophy className="h-4 w-4" />
+              Comentários do Jogo
+            </TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="chat" className="space-y-4">
+            {messages?.map((message) => (
+              <ChatMessage
+                key={message.id}
+                content={message.content}
+                isCurrentUser={message.user_id === userId}
+                timestamp={message.created_at}
+              />
+            ))}
+          </TabsContent>
+          
+          <TabsContent value="match">
+            <MatchComments 
+              matchId={selectedMatchId || ""} 
+              isOpen={activeTab === "match" && !!selectedMatchId} 
             />
-          ))}
-        </div>
+          </TabsContent>
+        </Tabs>
       </main>
 
       <div className="glass fixed bottom-0 left-0 right-0 p-4">
         <div className="container mx-auto">
-          <form onSubmit={handleSendMessage} className="flex gap-2">
-            <Input
-              type="text"
-              placeholder="Digite sua mensagem..."
-              value={newMessage}
-              onChange={(e) => setNewMessage(e.target.value)}
-              className="flex-1"
-            />
-            <Button type="submit">Enviar</Button>
-          </form>
+          {activeTab === "chat" ? (
+            <form onSubmit={handleSendMessage} className="flex gap-2">
+              <Input
+                type="text"
+                placeholder="Digite sua mensagem..."
+                value={newMessage}
+                onChange={(e) => setNewMessage(e.target.value)}
+                className="flex-1"
+              />
+              <Button type="submit">Enviar</Button>
+            </form>
+          ) : null}
         </div>
       </div>
     </div>

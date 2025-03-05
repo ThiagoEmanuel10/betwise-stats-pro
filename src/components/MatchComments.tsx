@@ -19,6 +19,12 @@ interface MatchCommentsProps {
   isOpen: boolean;
 }
 
+// Basic profanity filter with common bad words
+const PROFANITY_LIST = [
+  'palavrão1', 'palavrão2', 'xingamento1', 'xingamento2', 
+  // Add more bad words as needed in Portuguese and other languages
+];
+
 export function MatchComments({ matchId, isOpen }: MatchCommentsProps) {
   const [newComment, setNewComment] = useState("");
   const { toast } = useToast();
@@ -41,6 +47,54 @@ export function MatchComments({ matchId, isOpen }: MatchCommentsProps) {
     enabled: isOpen,
   });
 
+  // Check if text contains profanity
+  const containsProfanity = (text: string): boolean => {
+    const lowerText = text.toLowerCase();
+    return PROFANITY_LIST.some(word => 
+      lowerText.includes(word.toLowerCase()) || 
+      // Also check for variations with spaces in between letters
+      lowerText.match(new RegExp(word.split('').join('\\s*'), 'i'))
+    );
+  };
+
+  // Check if text has excessive capitalization (shouting)
+  const hasExcessiveCaps = (text: string): boolean => {
+    const caps = text.replace(/[^A-Z]/g, '').length;
+    const chars = text.length;
+    return chars > 5 && (caps / chars) > 0.7; // If >70% of chars are caps
+  };
+
+  // Content moderation function
+  const moderateContent = (text: string): { isValid: boolean; moderatedText?: string; reason?: string } => {
+    // Check for profanity
+    if (containsProfanity(text)) {
+      return { isValid: false, reason: "Comentário contém linguagem imprópria." };
+    }
+    
+    // Check for excessive capitalization
+    if (hasExcessiveCaps(text)) {
+      const moderatedText = text.toLowerCase();
+      return { 
+        isValid: true, 
+        moderatedText, 
+        reason: "Comentário modificado para remover capitalização excessiva." 
+      };
+    }
+    
+    // Check for repeated characters (like "hellooooooo")
+    const repeatedCharsRegex = /(.)\1{4,}/g;
+    if (repeatedCharsRegex.test(text)) {
+      const moderatedText = text.replace(repeatedCharsRegex, '$1$1$1');
+      return { 
+        isValid: true, 
+        moderatedText, 
+        reason: "Comentário modificado para remover caracteres repetidos." 
+      };
+    }
+    
+    return { isValid: true, moderatedText: text };
+  };
+
   const handleSubmitComment = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newComment.trim()) return;
@@ -56,12 +110,34 @@ export function MatchComments({ matchId, isOpen }: MatchCommentsProps) {
       return;
     }
 
+    // Apply content moderation
+    const moderationResult = moderateContent(newComment);
+    
+    // If content is invalid, show error and don't submit
+    if (!moderationResult.isValid) {
+      toast({
+        variant: "destructive",
+        description: moderationResult.reason,
+      });
+      return;
+    }
+
+    // Use moderated text if available
+    const contentToSubmit = moderationResult.moderatedText || newComment;
+
+    // If moderation changed the content, notify the user
+    if (contentToSubmit !== newComment && moderationResult.reason) {
+      toast({
+        description: moderationResult.reason,
+      });
+    }
+
     try {
       const { error } = await supabase
         .from('match_comments')
         .insert({
           match_id: matchId,
-          content: newComment,
+          content: contentToSubmit,
           user_id: session.user.id
         });
 
@@ -115,4 +191,3 @@ export function MatchComments({ matchId, isOpen }: MatchCommentsProps) {
     </div>
   );
 }
-
