@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
-const LEAGUES = {
+export const LEAGUES = {
   '39': 'Premier League',
   '71': 'Brasileirão Série A',
   '140': 'La Liga',

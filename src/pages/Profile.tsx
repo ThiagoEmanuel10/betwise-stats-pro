@@ -1,10 +1,13 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Bell, User, Shield, Star, Settings } from "lucide-react";
+import { Bell, User, Shield, Star, Settings, List } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import type { Database } from "@/integrations/supabase/types";
 import { UserRankings } from "@/components/UserRankings";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { FavoritesTab } from "@/components/FavoritesTab";
+import { PredictionHistory } from "@/components/PredictionHistory";
 
 type Profile = Database['public']['Tables']['profiles']['Row'];
 
@@ -76,20 +79,36 @@ const Profile = () => {
               <p className="text-sm text-muted-foreground">@{profile?.username}</p>
             </div>
           </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <button className="flex items-center gap-2 p-4 rounded-lg bg-secondary/50 hover:bg-secondary transition-colors">
-              <Star className="w-5 h-5 text-primary" />
-              <span className="font-medium">Times Favoritos</span>
-            </button>
-            <button className="flex items-center gap-2 p-4 rounded-lg bg-secondary/50 hover:bg-secondary transition-colors">
-              <Shield className="w-5 h-5 text-primary" />
-              <span className="font-medium">Minhas Apostas</span>
-            </button>
-          </div>
         </div>
 
-        <UserRankings />
+        <Tabs defaultValue="stats" className="w-full">
+          <TabsList className="grid grid-cols-3 mb-4">
+            <TabsTrigger value="stats" className="flex items-center gap-2">
+              <Shield className="h-4 w-4" />
+              Estatísticas
+            </TabsTrigger>
+            <TabsTrigger value="favorites" className="flex items-center gap-2">
+              <Star className="h-4 w-4" />
+              Favoritos
+            </TabsTrigger>
+            <TabsTrigger value="history" className="flex items-center gap-2">
+              <List className="h-4 w-4" />
+              Histórico
+            </TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="stats">
+            <UserRankings />
+          </TabsContent>
+          
+          <TabsContent value="favorites">
+            <FavoritesTab />
+          </TabsContent>
+          
+          <TabsContent value="history">
+            <PredictionHistory />
+          </TabsContent>
+        </Tabs>
 
         <div className="glass rounded-lg p-6">
           <h3 className="text-lg font-semibold mb-4">Configurações</h3>
@@ -123,6 +142,6 @@ const Profile = () => {
       </main>
     </div>
   );
-};
+}
 
 export default Profile;
