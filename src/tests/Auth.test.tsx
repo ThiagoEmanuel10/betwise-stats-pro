@@ -1,4 +1,3 @@
-
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
@@ -75,7 +74,43 @@ describe('Auth Component', () => {
 
   it('handles login submission', async () => {
     vi.mocked(supabase.auth.signInWithPassword).mockResolvedValue({ 
-      data: { user: {}, session: {} }, 
+      data: { 
+        user: {
+          id: 'test-user-id',
+          app_metadata: {},
+          user_metadata: {},
+          aud: 'authenticated',
+          created_at: '2023-01-01T00:00:00Z',
+          updated_at: '2023-01-01T00:00:00Z',
+          email: 'test@example.com',
+          phone: '',
+          confirmed_at: '2023-01-01T00:00:00Z',
+          last_sign_in_at: '2023-01-01T00:00:00Z',
+          role: 'authenticated',
+          identities: []
+        }, 
+        session: {
+          access_token: 'test-access-token',
+          refresh_token: 'test-refresh-token',
+          expires_in: 3600,
+          expires_at: 999999999,
+          token_type: 'bearer',
+          user: {
+            id: 'test-user-id',
+            app_metadata: {},
+            user_metadata: {},
+            aud: 'authenticated',
+            created_at: '2023-01-01T00:00:00Z',
+            updated_at: '2023-01-01T00:00:00Z',
+            email: 'test@example.com',
+            phone: '',
+            confirmed_at: '2023-01-01T00:00:00Z',
+            last_sign_in_at: '2023-01-01T00:00:00Z',
+            role: 'authenticated',
+            identities: []
+          }
+        }
+      }, 
       error: null 
     });
 

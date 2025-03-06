@@ -269,7 +269,7 @@ const Auth = () => {
                 )}
               </Button>
 
-              {mode !== "forgotPassword" && (
+              {mode !== "forgotPassword" && mode !== "resetSuccess" && (
                 <>
                   <div className="relative flex items-center justify-center mt-4">
                     <div className="border-t border-border flex-grow"></div>
