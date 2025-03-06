@@ -3,7 +3,7 @@ import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Toolti
 import { Card, CardContent } from "@/components/ui/card";
 import { PredictionData } from "./types";
 import { formatDate } from "./utils";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { trackEvent } from "@/lib/analytics";
 
 interface PredictionsCountChartProps {
@@ -12,6 +12,28 @@ interface PredictionsCountChartProps {
 
 export const PredictionsCountChart = ({ data }: PredictionsCountChartProps) => {
   const emptyStats = !data || data.length === 0;
+  const [animatedData, setAnimatedData] = useState<PredictionData[]>([]);
+
+  // Animação de entrada para os dados
+  useEffect(() => {
+    if (!emptyStats) {
+      // Começa com dados zerados para animação
+      const initialData = data.map(item => ({
+        ...item,
+        correct: 0,
+        incorrect: 0
+      }));
+      
+      setAnimatedData(initialData);
+      
+      // Anima até os valores reais em 1 segundo
+      const timeout = setTimeout(() => {
+        setAnimatedData(data);
+      }, 300);
+      
+      return () => clearTimeout(timeout);
+    }
+  }, [data, emptyStats]);
 
   // Track chart view
   useEffect(() => {
@@ -27,7 +49,7 @@ export const PredictionsCountChart = ({ data }: PredictionsCountChartProps) => {
 
   if (emptyStats) {
     return (
-      <Card>
+      <Card className="card-transition">
         <CardContent className="flex items-center justify-center h-[400px]">
           <p className="text-muted-foreground">No prediction data available for this period</p>
         </CardContent>
@@ -36,21 +58,53 @@ export const PredictionsCountChart = ({ data }: PredictionsCountChartProps) => {
   }
 
   return (
-    <ResponsiveContainer width="100%" height="100%">
-      <BarChart
-        data={data}
-        margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-      >
-        <CartesianGrid strokeDasharray="3 3" />
-        <XAxis dataKey="date" tickFormatter={formatDate} />
-        <YAxis />
-        <Tooltip 
-          labelFormatter={(label) => `Date: ${new Date(label).toLocaleDateString()}`}
-        />
-        <Legend />
-        <Bar dataKey="correct" name="Correct" fill="#4ade80" />
-        <Bar dataKey="incorrect" name="Incorrect" fill="#f87171" />
-      </BarChart>
-    </ResponsiveContainer>
+    <Card className="card-transition">
+      <CardContent className="p-4 fade-in">
+        <div className="h-[400px]">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart
+              data={animatedData}
+              margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+            >
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="date" tickFormatter={formatDate} />
+              <YAxis />
+              <Tooltip 
+                labelFormatter={(label) => `Date: ${new Date(label).toLocaleDateString()}`}
+                wrapperClassName="glass"
+                contentStyle={{
+                  borderRadius: '8px',
+                  boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+                  border: '1px solid rgba(255, 255, 255, 0.2)',
+                  padding: '8px 12px'
+                }}
+                cursor={{fill: 'rgba(0, 0, 0, 0.04)'}}
+              />
+              <Legend 
+                wrapperStyle={{
+                  paddingTop: '10px'
+                }}
+              />
+              <Bar 
+                dataKey="correct" 
+                name="Correct" 
+                fill="#4ade80" 
+                radius={[4, 4, 0, 0]}
+                animationDuration={1500}
+                animationEasing="ease-in-out"
+              />
+              <Bar 
+                dataKey="incorrect" 
+                name="Incorrect" 
+                fill="#f87171" 
+                radius={[4, 4, 0, 0]}
+                animationDuration={1500}
+                animationEasing="ease-in-out"
+              />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </CardContent>
+    </Card>
   );
 };

@@ -40,3 +40,51 @@
 .read-the-docs {
   color: #888;
 }
+
+/* Customizações de animação para toasts */
+.sonner-toast {
+  animation: slide-in-right 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+}
+
+@keyframes slide-in-right {
+  0% {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.toaster-enter {
+  animation: toast-enter 0.35s ease forwards;
+}
+
+@keyframes toast-enter {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Efeito de destaque para novos itens */
+.item-highlight {
+  animation: item-highlight 2s ease-in-out;
+}
+
+@keyframes item-highlight {
+  0% {
+    background-color: transparent;
+  }
+  30% {
+    background-color: rgba(59, 130, 246, 0.1);
+  }
+  100% {
+    background-color: transparent;
+  }
+}
