@@ -74,7 +74,10 @@ describe('Auth Component', () => {
   });
 
   it('handles login submission', async () => {
-    vi.mocked(supabase.auth.signInWithPassword).mockResolvedValue({ data: {}, error: null });
+    vi.mocked(supabase.auth.signInWithPassword).mockResolvedValue({ 
+      data: { user: {}, session: {} }, 
+      error: null 
+    });
 
     render(
       <BrowserRouter>
