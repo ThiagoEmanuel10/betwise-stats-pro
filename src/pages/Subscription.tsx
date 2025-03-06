@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { 
   Check, 
@@ -13,13 +13,103 @@ import {
   PieChart,
   DatabaseBackup,
   Clock,
-  TrendingUp
+  TrendingUp,
+  Loader2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { useToast } from "@/components/ui/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const SubscriptionPlans = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
+  const [loading, setLoading] = useState(false);
+  const [processingPlan, setProcessingPlan] = useState<string | null>(null);
+  const [user, setUser] = useState<any>(null);
+  const [userSubscription, setUserSubscription] = useState<string>("Básico");
+
+  useEffect(() => {
+    const checkUser = async () => {
+      const { data } = await supabase.auth.getSession();
+      
+      if (data.session?.user) {
+        setUser(data.session.user);
+        
+        // Fetch user's subscription status
+        const { data: profile, error } = await supabase
+          .from("profiles")
+          .select("subscription_plan")
+          .eq("id", data.session.user.id)
+          .single();
+          
+        if (profile && profile.subscription_plan) {
+          setUserSubscription(profile.subscription_plan);
+        }
+      }
+    };
+    
+    checkUser();
+  }, []);
+
+  const handleSubscription = async (planName: string) => {
+    if (!user) {
+      toast({
+        title: "Login necessário",
+        description: "Você precisa estar logado para assinar um plano",
+        variant: "destructive"
+      });
+      navigate('/auth');
+      return;
+    }
+
+    if (userSubscription === planName) {
+      toast({
+        title: "Plano atual",
+        description: `Você já está inscrito no plano ${planName}`,
+      });
+      return;
+    }
+    
+    if (planName === "Básico") {
+      toast({
+        title: "Plano gratuito",
+        description: "O plano Básico é gratuito e já está ativo.",
+      });
+      return;
+    }
+    
+    try {
+      setLoading(true);
+      setProcessingPlan(planName);
+      
+      const { data, error } = await supabase.functions.invoke('stripe-payment', {
+        body: {
+          plan: planName,
+          userId: user.id,
+          returnUrl: window.location.origin + '/subscription'
+        }
+      });
+      
+      if (error) throw error;
+      
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        throw new Error("Falha ao criar sessão de pagamento");
+      }
+    } catch (error: any) {
+      console.error("Error initiating subscription:", error);
+      toast({
+        title: "Erro ao processar",
+        description: error.message || "Não foi possível processar o pagamento",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+      setProcessingPlan(null);
+    }
+  };
 
   const plans = [
     {
@@ -81,6 +171,33 @@ const SubscriptionPlans = () => {
     }
   ];
 
+  // Check for URL params indicating payment result
+  useEffect(() => {
+    const queryParams = new URLSearchParams(window.location.search);
+    const success = queryParams.get('success');
+    const sessionId = queryParams.get('session_id');
+    const canceled = queryParams.get('canceled');
+    
+    if (success === 'true' && sessionId) {
+      // Clear URL params
+      window.history.replaceState({}, document.title, window.location.pathname);
+      
+      toast({
+        title: "Assinatura realizada com sucesso!",
+        description: "Seu plano foi ativado. Aproveite os novos recursos!",
+      });
+    } else if (canceled === 'true') {
+      // Clear URL params
+      window.history.replaceState({}, document.title, window.location.pathname);
+      
+      toast({
+        title: "Assinatura cancelada",
+        description: "Você cancelou o processo de assinatura.",
+        variant: "destructive"
+      });
+    }
+  }, [toast]);
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-secondary/30 py-12">
       <header className="glass sticky top-0 z-50 p-4 mb-6">
@@ -95,6 +212,13 @@ const SubscriptionPlans = () => {
           <p className="text-muted-foreground">
             Desbloqueie todo o potencial das suas previsões e análises com nossos planos de assinatura
           </p>
+          {userSubscription !== "Básico" && (
+            <div className="mt-4 p-2 bg-primary/10 rounded-md inline-block">
+              <p className="text-primary font-medium">
+                Plano atual: {userSubscription}
+              </p>
+            </div>
+          )}
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
@@ -103,7 +227,7 @@ const SubscriptionPlans = () => {
               key={index} 
               className={`slide-up glass transition-all duration-300 hover:shadow-lg ${
                 plan.name === "Premium" ? "md:scale-105 border-2 " + plan.highlightColor : "border " + plan.highlightColor
-              }`}
+              } ${userSubscription === plan.name ? "ring-2 ring-primary" : ""}`}
               style={{ animationDelay: `${index * 150}ms` }}
             >
               <CardHeader>
@@ -112,6 +236,11 @@ const SubscriptionPlans = () => {
                   {plan.name === "Premium" && <BarChart3 className="w-5 h-5 text-primary" />}
                   {plan.name === "Ultra" && <Zap className="w-5 h-5 text-accent" />}
                   {plan.name}
+                  {userSubscription === plan.name && (
+                    <span className="ml-2 text-xs bg-primary text-primary-foreground px-2 py-0.5 rounded-full">
+                      Ativo
+                    </span>
+                  )}
                 </CardTitle>
                 <CardDescription>{plan.description}</CardDescription>
                 <div className="mt-4">
@@ -139,8 +268,19 @@ const SubscriptionPlans = () => {
                   variant={plan.buttonVariant} 
                   className="w-full" 
                   size="lg"
+                  disabled={loading || userSubscription === plan.name}
+                  onClick={() => handleSubscription(plan.name)}
                 >
-                  {plan.name === "Básico" ? "Plano Atual" : "Assinar Agora"}
+                  {loading && processingPlan === plan.name ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Processando...
+                    </>
+                  ) : userSubscription === plan.name ? (
+                    "Plano Atual"
+                  ) : (
+                    plan.name === "Básico" ? "Plano Gratuito" : "Assinar Agora"
+                  )}
                 </Button>
               </CardFooter>
             </Card>
