@@ -8,6 +8,8 @@ import { MatchComments } from "./MatchComments";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { useNavigate } from "react-router-dom";
+import { SharePrediction } from "./SharePrediction";
+import { trackPredictionView } from "@/lib/analytics";
 
 interface MatchCardProps {
   fixture: any;
@@ -22,6 +24,13 @@ export function MatchCard({ fixture, isFavorite = false, onToggleFavorite }: Mat
   const formattedDate = formatDate(matchDate);
   const { toast } = useToast();
   const navigate = useNavigate();
+
+  // Track prediction view
+  useState(() => {
+    const matchId = fixture.fixture.id.toString();
+    const teams = `${fixture.teams.home.name} vs ${fixture.teams.away.name}`;
+    trackPredictionView(matchId, teams);
+  });
 
   const addTeamToFavorites = async (team: any) => {
     try {
@@ -100,6 +109,13 @@ export function MatchCard({ fixture, isFavorite = false, onToggleFavorite }: Mat
               >
                 <MessageCircle className="h-5 w-5" />
               </Button>
+              <SharePrediction 
+                matchId={fixture.fixture.id.toString()}
+                homeTeam={fixture.teams.home.name}
+                awayTeam={fixture.teams.away.name}
+                league={fixture.league?.name || "Unknown League"}
+                date={fixture.fixture.date}
+              />
               <Button
                 variant="ghost"
                 size="icon"

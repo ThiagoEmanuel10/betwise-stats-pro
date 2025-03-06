@@ -1,12 +1,19 @@
 
 import { Bell, User } from "lucide-react";
+import { useEffect } from "react";
 import { MatchCard } from "@/components/MatchCard";
 import { StatisticsTab } from "@/components/StatisticsTab";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Logo } from "@/components/Logo";
+import { trackPageView } from "@/lib/analytics";
 
 const Index = () => {
+  // Track page view
+  useEffect(() => {
+    trackPageView("/", "BetWise Stats Pro - Home");
+  }, []);
+
   const { data: matches, isLoading } = useQuery({
     queryKey: ['matches'],
     queryFn: async () => {
@@ -58,7 +65,7 @@ const Index = () => {
           ) : (
             <div className="space-y-4">
               {matches?.map((match) => (
-                <MatchCard key={match.fixture.id} fixture={match.fixture} />
+                <MatchCard key={match.fixture.id} fixture={match} />
               ))}
             </div>
           )}

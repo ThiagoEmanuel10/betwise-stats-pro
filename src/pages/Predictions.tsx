@@ -1,9 +1,10 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useMatches } from "@/hooks/useMatches";
 import { PredictionsHeader } from "@/components/PredictionsHeader";
 import { MatchesList } from "@/components/MatchesList";
 import type { Filters } from "@/components/AdvancedFilters";
+import { trackPageView } from "@/lib/analytics";
 
 const Predictions = () => {
   const [filters, setFilters] = useState<Filters>({
@@ -11,6 +12,11 @@ const Predictions = () => {
     onlyLive: false,
     sortBy: "date"
   });
+
+  // Track page view
+  useEffect(() => {
+    trackPageView("/predictions", "BetWise Stats Pro - Predictions");
+  }, []);
 
   const { matches, isLoading, favoriteMatches, toggleFavorite, leagues } = useMatches(filters);
 
