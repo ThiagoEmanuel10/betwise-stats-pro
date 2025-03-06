@@ -174,6 +174,9 @@ export type Database = {
           full_name: string | null
           id: string
           notification_preferences: Json | null
+          subscription_id: string | null
+          subscription_plan: string | null
+          subscription_status: string | null
           theme_preference: string | null
           username: string | null
         }
@@ -184,6 +187,9 @@ export type Database = {
           full_name?: string | null
           id: string
           notification_preferences?: Json | null
+          subscription_id?: string | null
+          subscription_plan?: string | null
+          subscription_status?: string | null
           theme_preference?: string | null
           username?: string | null
         }
@@ -194,8 +200,44 @@ export type Database = {
           full_name?: string | null
           id?: string
           notification_preferences?: Json | null
+          subscription_id?: string | null
+          subscription_plan?: string | null
+          subscription_status?: string | null
           theme_preference?: string | null
           username?: string | null
+        }
+        Relationships: []
+      }
+      user_notifications: {
+        Row: {
+          created_at: string | null
+          data: Json | null
+          id: string
+          is_read: boolean | null
+          message: string
+          title: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          data?: Json | null
+          id?: string
+          is_read?: boolean | null
+          message: string
+          title: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          data?: Json | null
+          id?: string
+          is_read?: boolean | null
+          message?: string
+          title?: string
+          type?: string
+          user_id?: string
         }
         Relationships: []
       }

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { 
@@ -37,7 +36,7 @@ const SubscriptionPlans = () => {
         setUser(data.session.user);
         
         // Fetch user's subscription status
-        const { data: profile, error } = await supabase
+        const { data: profile } = await supabase
           .from("profiles")
           .select("subscription_plan")
           .eq("id", data.session.user.id)

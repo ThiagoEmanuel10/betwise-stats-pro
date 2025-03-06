@@ -56,6 +56,15 @@ serve(async (req) => {
             throw error;
           }
 
+          // Send notification to user
+          await supabase.functions.invoke("webhook-notifications", {
+            body: { 
+              eventType: "subscription_change", 
+              userId: userId,
+              data: { plan: plan }
+            }
+          });
+
           console.log(`Successfully updated subscription for user ${userId}`);
           break;
         }
@@ -91,6 +100,15 @@ serve(async (req) => {
               console.error("Error updating subscription status:", updateError);
               throw updateError;
             }
+
+            // Send notification to user
+            await supabase.functions.invoke("webhook-notifications", {
+              body: { 
+                eventType: "subscription_status", 
+                userId: userId,
+                data: { status: status }
+              }
+            });
 
             console.log(`Updated subscription status for user ${userId} to ${status}`);
           } else {
@@ -133,6 +151,15 @@ serve(async (req) => {
               console.error("Error resetting subscription:", updateError);
               throw updateError;
             }
+
+            // Send notification to user
+            await supabase.functions.invoke("webhook-notifications", {
+              body: { 
+                eventType: "subscription_change", 
+                userId: userId,
+                data: { plan: "Básico" }
+              }
+            });
 
             console.log(`Reset subscription for user ${userId} to Basic plan`);
           }
