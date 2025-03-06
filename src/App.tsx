@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { ThemeProvider } from "@/hooks/use-theme";
+import { PWAInstallButton } from "@/components/PWAInstallButton";
 import Index from "./pages/Index";
 import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
@@ -52,7 +53,8 @@ const App = () => (
     <ThemeProvider>
       <TooltipProvider>
         <div className="min-h-screen bg-gradient-to-br from-background via-background to-secondary/20">
-          <div className="fixed top-4 right-4 z-50">
+          <div className="fixed top-4 right-4 z-50 flex items-center gap-2">
+            <PWAInstallButton />
             <ThemeToggle />
           </div>
           <Toaster />
