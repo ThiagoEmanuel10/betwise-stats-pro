@@ -10,6 +10,7 @@ import { UserStats } from "@/components/dashboard/UserStats";
 import { PredictionStats } from "@/components/dashboard/PredictionStats";
 import { LeaguePopularity } from "@/components/dashboard/LeaguePopularity";
 import { RevenueOverview } from "@/components/dashboard/RevenueOverview";
+import { DataInsightsDashboard } from "@/components/dashboard/DataInsightsDashboard";
 import { LoadingSpinner } from "@/components/dashboard/LoadingSpinner";
 
 const Dashboard = () => {
@@ -76,11 +77,12 @@ const Dashboard = () => {
       <DashboardHeader />
       
       <Tabs defaultValue="overview" className="space-y-4 mt-8">
-        <TabsList className="grid grid-cols-4">
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="users">Users</TabsTrigger>
-          <TabsTrigger value="predictions">Predictions</TabsTrigger>
-          <TabsTrigger value="revenue">Revenue</TabsTrigger>
+        <TabsList className="grid grid-cols-5">
+          <TabsTrigger value="overview">Visão Geral</TabsTrigger>
+          <TabsTrigger value="users">Usuários</TabsTrigger>
+          <TabsTrigger value="predictions">Predições</TabsTrigger>
+          <TabsTrigger value="revenue">Receita</TabsTrigger>
+          <TabsTrigger value="insights">Insights</TabsTrigger>
         </TabsList>
         
         <TabsContent value="overview" className="space-y-4">
@@ -99,8 +101,8 @@ const Dashboard = () => {
         <TabsContent value="users" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>User Growth</CardTitle>
-              <CardDescription>New sign-ups over time</CardDescription>
+              <CardTitle>Crescimento de Usuários</CardTitle>
+              <CardDescription>Novas inscrições ao longo do tempo</CardDescription>
             </CardHeader>
             <CardContent className="h-[400px]">
               <UserStats type="growth" />
@@ -108,8 +110,8 @@ const Dashboard = () => {
           </Card>
           <Card>
             <CardHeader>
-              <CardTitle>User Retention</CardTitle>
-              <CardDescription>User engagement and retention metrics</CardDescription>
+              <CardTitle>Retenção de Usuários</CardTitle>
+              <CardDescription>Métricas de engajamento e retenção</CardDescription>
             </CardHeader>
             <CardContent className="h-[400px]">
               <UserStats type="retention" />
@@ -120,8 +122,8 @@ const Dashboard = () => {
         <TabsContent value="predictions" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Prediction Accuracy</CardTitle>
-              <CardDescription>Overall prediction accuracy by league</CardDescription>
+              <CardTitle>Precisão das Predições</CardTitle>
+              <CardDescription>Precisão geral das predições por liga</CardDescription>
             </CardHeader>
             <CardContent className="h-[400px]">
               <PredictionStats type="accuracy" />
@@ -129,8 +131,8 @@ const Dashboard = () => {
           </Card>
           <Card>
             <CardHeader>
-              <CardTitle>Popular Matches</CardTitle>
-              <CardDescription>Most predicted matches</CardDescription>
+              <CardTitle>Partidas Populares</CardTitle>
+              <CardDescription>Partidas mais preditas</CardDescription>
             </CardHeader>
             <CardContent className="h-[400px]">
               <PredictionStats type="popular" />
@@ -141,11 +143,23 @@ const Dashboard = () => {
         <TabsContent value="revenue" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Revenue Overview</CardTitle>
-              <CardDescription>Monthly revenue and subscriptions</CardDescription>
+              <CardTitle>Visão Geral de Receita</CardTitle>
+              <CardDescription>Receita mensal e assinaturas</CardDescription>
             </CardHeader>
             <CardContent className="h-[400px]">
               <RevenueOverview />
+            </CardContent>
+          </Card>
+        </TabsContent>
+        
+        <TabsContent value="insights" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Insights e Análises Avançadas</CardTitle>
+              <CardDescription>Análise detalhada de tendências e padrões</CardDescription>
+            </CardHeader>
+            <CardContent className="h-[500px]">
+              <DataInsightsDashboard />
             </CardContent>
           </Card>
         </TabsContent>
