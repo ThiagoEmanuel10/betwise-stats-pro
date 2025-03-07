@@ -39,8 +39,10 @@ const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
 
   if (isAuthenticated === null) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-primary"></div>
+      <div className="flex items-center justify-center min-h-screen" aria-live="polite" aria-busy="true">
+        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-primary" role="status">
+          <span className="sr-only">Carregando...</span>
+        </div>
       </div>
     );
   }
@@ -52,6 +54,9 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <ThemeProvider>
       <TooltipProvider>
+        <a href="#main-content" className="skip-to-content">
+          Pular para o conteúdo
+        </a>
         <div className="min-h-screen bg-gradient-to-br from-background via-background to-secondary/20">
           <div className="fixed top-4 right-4 z-50 flex items-center gap-2">
             <PWAInstallButton />
@@ -60,39 +65,41 @@ const App = () => (
           <Toaster />
           <Sonner />
           <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/auth" element={<Auth />} />
-              <Route path="/predictions" element={<Predictions />} />
-              <Route path="/high-probability" element={<HighProbabilityMatches />} />
-              <Route path="/subscription" element={<SubscriptionPlans />} />
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route
-                path="/chat"
-                element={
-                  <PrivateRoute>
-                    <Chat />
-                  </PrivateRoute>
-                }
-              />
-              <Route
-                path="/profile"
-                element={
-                  <PrivateRoute>
-                    <Profile />
-                  </PrivateRoute>
-                }
-              />
-              <Route
-                path="/settings"
-                element={
-                  <PrivateRoute>
-                    <Settings />
-                  </PrivateRoute>
-                }
-              />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
+            <main id="main-content" tabIndex={-1} className="outline-none">
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/auth" element={<Auth />} />
+                <Route path="/predictions" element={<Predictions />} />
+                <Route path="/high-probability" element={<HighProbabilityMatches />} />
+                <Route path="/subscription" element={<SubscriptionPlans />} />
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route
+                  path="/chat"
+                  element={
+                    <PrivateRoute>
+                      <Chat />
+                    </PrivateRoute>
+                  }
+                />
+                <Route
+                  path="/profile"
+                  element={
+                    <PrivateRoute>
+                      <Profile />
+                    </PrivateRoute>
+                  }
+                />
+                <Route
+                  path="/settings"
+                  element={
+                    <PrivateRoute>
+                      <Settings />
+                    </PrivateRoute>
+                  }
+                />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </main>
           </BrowserRouter>
         </div>
       </TooltipProvider>

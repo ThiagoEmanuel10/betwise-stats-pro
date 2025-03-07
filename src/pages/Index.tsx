@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Logo } from "@/components/Logo";
 import { trackPageView } from "@/lib/analytics";
 import { Toaster } from "@/components/ui/sonner";
+import { Link } from "react-router-dom";
 
 const Index = () => {
   const [showToaster] = useState(true);
@@ -17,7 +18,7 @@ const Index = () => {
     trackPageView("/", "BetWise Stats Pro - Home");
   }, []);
 
-  const { data: matches, isLoading } = useQuery({
+  const { data: matches, isLoading, error } = useQuery({
     queryKey: ['matches'],
     queryFn: async () => {
       const { data, error } = await supabase.functions.invoke('football-api', {
@@ -38,27 +39,37 @@ const Index = () => {
 
   return (
     <div className="min-h-screen">
-      <header className="glass sticky top-0 z-50 p-4 mb-6 border-b border-white/10">
+      <header className="glass sticky top-0 z-50 p-4 mb-6 border-b border-white/10" role="banner">
         <div className="container mx-auto flex items-center justify-between">
-          <Logo className="hover-shine" />
+          <Logo className="hover-shine" aria-label="BetWise Stats Pro" />
           <div className="flex items-center gap-4">
-            <button className="p-2 hover:bg-secondary/50 rounded-full transition-colors hover-expand">
-              <Bell className="w-5 h-5" />
+            <button 
+              className="p-2 hover:bg-secondary/50 rounded-full transition-colors hover-expand"
+              aria-label="Notificações"
+            >
+              <Bell className="w-5 h-5" aria-hidden="true" />
             </button>
-            <button className="p-2 hover:bg-secondary/50 rounded-full transition-colors hover-expand">
-              <User className="w-5 h-5" />
-            </button>
+            <Link 
+              to="/profile" 
+              className="p-2 hover:bg-secondary/50 rounded-full transition-colors hover-expand"
+              aria-label="Perfil de usuário"
+            >
+              <User className="w-5 h-5" aria-hidden="true" />
+            </Link>
           </div>
         </div>
       </header>
 
       <main className="container mx-auto px-4 pb-8">
-        <section className="mb-8 fade-in">
-          <h2 className="text-2xl font-semibold mb-6 bg-gradient-to-br from-primary to-accent bg-clip-text text-transparent slide-up">
+        <section className="mb-8 fade-in" aria-labelledby="featured-games-heading">
+          <h2 
+            id="featured-games-heading" 
+            className="text-2xl font-semibold mb-6 bg-gradient-to-br from-primary to-accent bg-clip-text text-transparent slide-up"
+          >
             Jogos em Destaque
           </h2>
           {isLoading ? (
-            <div className="space-y-4">
+            <div className="space-y-4" aria-live="polite" aria-busy="true">
               {[...Array(3)].map((_, i) => (
                 <div 
                   key={i} 
@@ -69,9 +80,15 @@ const Index = () => {
                     animation: 'fade-in 0.5s ease-out forwards'
                   }}
                 >
-                  <div className="h-20 bg-secondary/50 rounded-lg"></div>
+                  <div className="h-20 bg-secondary/50 rounded-lg" role="status">
+                    <span className="sr-only">Carregando jogos...</span>
+                  </div>
                 </div>
               ))}
+            </div>
+          ) : error ? (
+            <div className="p-4 bg-destructive/10 text-destructive rounded-lg" role="alert">
+              <p>Erro ao carregar os jogos. Por favor, tente novamente.</p>
             </div>
           ) : (
             <div className="space-y-4">
@@ -92,8 +109,11 @@ const Index = () => {
           )}
         </section>
 
-        <section className="fade-in" style={{ animationDelay: '300ms' }}>
-          <h2 className="text-2xl font-semibold mb-6 bg-gradient-to-br from-primary to-accent bg-clip-text text-transparent slide-up">
+        <section className="fade-in" style={{ animationDelay: '300ms' }} aria-labelledby="statistics-heading">
+          <h2 
+            id="statistics-heading" 
+            className="text-2xl font-semibold mb-6 bg-gradient-to-br from-primary to-accent bg-clip-text text-transparent slide-up"
+          >
             Estatísticas
           </h2>
           <StatisticsTab league="39" />

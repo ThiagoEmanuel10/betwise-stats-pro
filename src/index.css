@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -34,6 +33,9 @@
     --ring: 199 89% 48%;
 
     --radius: 0.75rem;
+    
+    --text-base-size: 1rem;
+    --focus-outline-width: 3px;
   }
  
   .dark {
@@ -73,6 +75,44 @@
   }
   body {
     @apply bg-background text-foreground antialiased;
+    font-size: var(--text-base-size);
+    line-height: 1.5;
+  }
+  
+  /* Melhorias de acessibilidade para foco */
+  :focus {
+    outline: var(--focus-outline-width) solid hsl(var(--ring));
+    outline-offset: 2px;
+  }
+  
+  /* Skip to content link para acessibilidade */
+  .skip-to-content {
+    @apply sr-only focus:not-sr-only focus:absolute focus:z-50 focus:p-4 focus:bg-background focus:border focus:rounded-md;
+  }
+  
+  /* Melhorias de contraste */
+  a {
+    @apply text-primary underline-offset-4 hover:underline focus:outline-offset-2;
+    text-decoration-thickness: 1px;
+  }
+  
+  /* Melhorar tamanho de clique para elementos interativos em dispositivos móveis */
+  button, 
+  [role="button"],
+  a,
+  input[type="submit"],
+  input[type="button"] {
+    @apply min-h-[44px] min-w-[44px];
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-medium;
+    line-height: 1.2;
+  }
+  
+  /* Garantir que o contraste de texto seja suficiente */
+  .text-muted-foreground {
+    @apply text-opacity-90;
   }
 }
 
@@ -109,6 +149,29 @@
   }
   to {
     opacity: 1;
+  }
+}
+
+/* Utilidades de acessibilidade */
+@layer utilities {
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+  
+  .focus-visible {
+    @apply outline-none ring-2 ring-ring ring-offset-2;
+  }
+  
+  .keyboard-only {
+    @apply opacity-0 pointer-events-none focus-visible:opacity-100 focus-visible:pointer-events-auto;
   }
 }
 

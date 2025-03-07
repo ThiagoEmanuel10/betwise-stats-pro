@@ -62,9 +62,10 @@ export const PWAInstallButton = () => {
       size="sm"
       className="flex items-center gap-2 bg-primary/10 text-primary hover:bg-primary/20 transition-all"
       onClick={handleInstallClick}
+      aria-label="Instalar aplicativo"
     >
-      <Download size={16} />
-      Instalar app
+      <Download size={16} aria-hidden="true" />
+      <span>Instalar app</span>
     </Button>
   );
 };
