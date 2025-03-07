@@ -1,69 +1,128 @@
-# Welcome to your Lovable project
 
-## Project info
+# Previsão de Jogos - Aplicativo de Futebol
+
+## Visão Geral do Projeto
+
+Esta é uma aplicação web progressiva (PWA) para previsões de jogos de futebol, que permite aos usuários fazer previsões, acompanhar estatísticas e interagir com outros entusiastas de futebol.
 
 **URL**: https://lovable.dev/projects/25eb8964-8a9b-40d8-9883-0f46436e88de
 
-## How can I edit this code?
+## Funcionalidades Principais
 
-There are several ways of editing your application.
+- **Previsões de Jogos**: Faça previsões para jogos de futebol de diversas ligas.
+- **Estatísticas Avançadas**: Acesse estatísticas detalhadas e visualizações de dados.
+- **Jogos com Alta Probabilidade**: Veja jogos com maior probabilidade estatística de acerto.
+- **Chat Comunitário**: Interaja com outros usuários e compartilhe insights.
+- **Planos de Assinatura**: Acesse recursos premium com planos pagos.
+- **PWA**: Instale a aplicação em dispositivos móveis para acesso offline.
+- **Acessibilidade**: Compatível com diretrizes WCAG para garantir acesso a todos os usuários.
 
-**Use Lovable**
+## Tecnologias
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/25eb8964-8a9b-40d8-9883-0f46436e88de) and start prompting.
+### Frontend
+- React + TypeScript
+- Vite
+- Tailwind CSS
+- shadcn/ui
+- React Router
+- TanStack Query
+- Recharts
 
-Changes made via Lovable will be committed automatically to this repo.
+### Backend
+- Supabase (PostgreSQL)
+- Edge Functions
+- API de futebol
+- Integração com Stripe
 
-**Use your preferred IDE**
+## Como Executar o Projeto
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### Pré-requisitos
+- Node.js & npm - [Instalar com nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
+### Passos para Execução Local
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+# Passo 1: Clone o repositório
+git clone <URL_DO_REPOSITÓRIO>
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+# Passo 2: Navegue até o diretório do projeto
+cd <NOME_DO_PROJETO>
 
-# Step 3: Install the necessary dependencies.
+# Passo 3: Instale as dependências
 npm i
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Passo 4: Execute o servidor de desenvolvimento
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+## Estrutura do Projeto
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+```
+project-root/
+├── public/             # Arquivos estáticos
+├── src/
+│   ├── components/     # Componentes React
+│   │   ├── ui/         # Componentes UI básicos
+│   │   ├── dashboard/  # Componentes do dashboard
+│   │   └── statistics/ # Componentes de estatísticas
+│   ├── hooks/          # Hooks personalizados
+│   ├── integrations/   # Integrações externas
+│   ├── lib/            # Utilitários
+│   ├── pages/          # Páginas da aplicação
+│   └── tests/          # Testes
+└── supabase/
+    └── functions/      # Edge Functions
+```
 
-**Use GitHub Codespaces**
+## Guia para Desenvolvedores
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+### Convenções de Código
 
-## What technologies are used for this project?
+- **Commits**: Seguimos o padrão Conventional Commits (feat, fix, docs, etc.)
+- **Componentes**: Criamos componentes pequenos e focados
+- **TypeScript**: Usamos tipos explícitos e evitamos `any`
+- **Acessibilidade**: Seguimos as diretrizes WCAG para acessibilidade
+- **Estilo**: Código formatado com ESLint e Prettier
 
-This project is built with .
+### Fluxo de Trabalho Git
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+1. Crie uma branch a partir da `main`: `git checkout -b feature/nome-da-feature`
+2. Faça suas alterações e adicione testes quando aplicável
+3. Execute os testes: `npm test`
+4. Faça commit e push: `git push origin feature/nome-da-feature`
+5. Abra um Pull Request para a `main`
 
-## How can I deploy this project?
+### Banco de Dados
 
-Simply open [Lovable](https://lovable.dev/projects/25eb8964-8a9b-40d8-9883-0f46436e88de) and click on Share -> Publish.
+O projeto utiliza o Supabase como backend, com as seguintes tabelas principais:
+- `profiles`: Perfis de usuários
+- `match_predictions`: Previsões dos usuários
+- `favorite_teams`: Times favoritos
+- `favorite_matches`: Partidas favoritadas
+- `user_notifications`: Notificações dos usuários
+- `user_rankings`: Ranking dos usuários
 
-## I want to use a custom domain - is that possible?
+### Edge Functions
 
-We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)
+O projeto utiliza Edge Functions do Supabase para:
+- Integração com API de futebol
+- Processamento de pagamentos via Stripe
+- Envio de notificações
+
+## Documentação para Usuários
+
+Para acessar a documentação completa para usuários, visite a [página de documentação](https://lovable.dev/projects/25eb8964-8a9b-40d8-9883-0f46436e88de/documentation) no aplicativo.
+
+## Como Contribuir
+
+Contribuições são bem-vindas! Para contribuir:
+
+1. Abra uma issue descrevendo a feature ou correção
+2. Crie um fork do repositório
+3. Crie uma branch para sua feature
+4. Adicione suas alterações e commit
+5. Abra um pull request
+
+## Licença
+
+Este projeto está licenciado sob os termos da licença MIT.
