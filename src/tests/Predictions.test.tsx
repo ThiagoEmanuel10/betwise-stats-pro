@@ -68,7 +68,15 @@ describe('Predictions Component', () => {
       isLoading: true,
       favoriteMatches: [],
       toggleFavorite: vi.fn(),
-      leagues: { '39': 'Premier League' }
+      leagues: { 
+        '39': 'Premier League',
+        '71': 'Brasileirão Série A',
+        '140': 'La Liga',
+        '78': 'Bundesliga',
+        '135': 'Serie A',
+        '61': 'Ligue 1',
+        '2': 'Champions League'
+      }
     });
 
     render(
@@ -103,7 +111,15 @@ describe('Predictions Component', () => {
       isLoading: false,
       favoriteMatches: ['1'],
       toggleFavorite: vi.fn(),
-      leagues: { '39': 'Premier League' }
+      leagues: { 
+        '39': 'Premier League',
+        '71': 'Brasileirão Série A',
+        '140': 'La Liga',
+        '78': 'Bundesliga',
+        '135': 'Serie A',
+        '61': 'Ligue 1',
+        '2': 'Champions League'
+      }
     });
 
     render(

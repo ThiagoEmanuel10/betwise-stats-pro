@@ -15,7 +15,7 @@ import { AdvancedMetrics } from "./statistics/AdvancedMetrics";
 import { Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { TimeFilter, DataVisualizationPreferences, ChartType, ColorScheme } from "./statistics/types";
+import { TimeFilter, DataVisualizationPreferences, ChartType, ColorScheme, PredictionData } from "./statistics/types";
 import { supabase } from "@/integrations/supabase/client";
 
 interface StatisticsTabProps {
@@ -56,6 +56,9 @@ export const StatisticsTab = ({ league }: StatisticsTabProps) => {
     return <div className="h-48 w-full animate-pulse bg-secondary/50 rounded-lg"></div>;
   }
 
+  // Ensure predictionStats is always an array
+  const safeStats: PredictionData[] = predictionStats || [];
+
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
@@ -95,15 +98,15 @@ export const StatisticsTab = ({ league }: StatisticsTabProps) => {
         </TabsList>
 
         <TabsContent value="accuracy" className="h-[400px]">
-          <AccuracyRateChart data={predictionStats || []} />
+          <AccuracyRateChart data={safeStats} />
         </TabsContent>
 
         <TabsContent value="predictions" className="h-[400px]">
-          <PredictionsCountChart data={predictionStats || []} />
+          <PredictionsCountChart data={safeStats} />
         </TabsContent>
 
         <TabsContent value="combined" className="h-[400px]">
-          <CombinedChart data={predictionStats || []} />
+          <CombinedChart data={safeStats} />
         </TabsContent>
 
         <TabsContent value="league" className="h-[400px]">

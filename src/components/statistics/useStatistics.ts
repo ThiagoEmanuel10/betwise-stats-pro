@@ -91,7 +91,7 @@ export const useStatistics = (league: string, timeFilter: TimeFilter) => {
     },
     // Otimizações de cache
     staleTime: 5 * 60 * 1000, // 5 minutos
-    cacheTime: 30 * 60 * 1000, // 30 minutos
+    gcTime: 30 * 60 * 1000, // 30 minutos (replacing cacheTime with gcTime)
     // Configuração de revalidação
     refetchOnWindowFocus: false,
     refetchOnMount: true,

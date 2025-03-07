@@ -20,7 +20,7 @@ describe('PredictionsHeader Component', () => {
     filters: {
       search: '',
       onlyLive: false,
-      sortBy: 'date'
+      sortBy: 'date' as const // Type assertion to make TypeScript happy
     },
     onFiltersChange: vi.fn(),
     leagues: { 
