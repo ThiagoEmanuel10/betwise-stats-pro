@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { useMemo, useCallback } from "react";
 
 export const LEAGUES = {
   '39': 'Premier League',
@@ -25,25 +26,37 @@ export const useMatches = (filters: {
   const navigate = useNavigate();
   const { toast } = useToast();
 
+  // Otimização: Definindo parâmetros da consulta fora da função useQuery
+  const queryParams = useMemo(() => {
+    const now = new Date();
+    const nextWeek = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+    
+    return {
+      league: filters.league || '39',
+      season: '2023',
+      from: now.toISOString().split('T')[0],
+      to: nextWeek.toISOString().split('T')[0],
+      live: filters.onlyLive ? 'all' : undefined,
+    };
+  }, [filters.league, filters.onlyLive]);
+
   const { data: matches, isLoading } = useQuery({
-    queryKey: ['matches-predictions', filters],
+    queryKey: ['matches-predictions', queryParams],
     queryFn: async () => {
       const { data, error } = await supabase.functions.invoke('football-api', {
         body: {
           endpoint: 'fixtures',
-          params: {
-            league: filters.league || '39',
-            season: '2023',
-            from: new Date().toISOString().split('T')[0],
-            to: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-            live: filters.onlyLive ? 'all' : undefined,
-          },
+          params: queryParams,
         },
       });
 
       if (error) throw error;
       return data.response;
     },
+    // Otimizações de cache
+    staleTime: 5 * 60 * 1000, // 5 minutos
+    // Primeiro carregamento pode ser mais lento, então mostraremos placeholders
+    placeholderData: [],
   });
 
   const { data: favoriteMatches } = useQuery({
@@ -56,9 +69,11 @@ export const useMatches = (filters: {
       if (error) throw error;
       return data.map(match => match.match_id);
     },
+    staleTime: 60 * 1000, // 1 minuto
   });
 
-  const toggleFavorite = async (match: any) => {
+  // Otimização: usando useCallback para evitar recriações desnecessárias da função
+  const toggleFavorite = useCallback(async (match: any) => {
     const { data: { session } } = await supabase.auth.getSession();
     
     if (!session) {
@@ -119,34 +134,41 @@ export const useMatches = (filters: {
         description: "Partida adicionada aos favoritos"
       });
     }
-  };
+  }, [favoriteMatches, navigate, toast]);
 
-  const filteredMatches = matches?.filter((match) => {
-    if (filters.search) {
-      const searchLower = filters.search.toLowerCase();
-      if (!match.teams.home.name.toLowerCase().includes(searchLower) &&
-          !match.teams.away.name.toLowerCase().includes(searchLower)) {
-        return false;
-      }
-    }
+  // Otimização: filtragem e ordenação memoizada para evitar recálculos desnecessários
+  const filteredMatches = useMemo(() => {
+    if (!matches) return [];
     
-    if (filters.league && match.league.id.toString() !== filters.league) {
-      return false;
-    }
-    
-    return true;
-  }).sort((a, b) => {
-    switch (filters.sortBy) {
-      case "date":
-        return new Date(a.fixture.date).getTime() - new Date(b.fixture.date).getTime();
-      case "probability":
-        return (b.predictions?.winning_percent || 0) - (a.predictions?.winning_percent || 0);
-      case "popularity":
-        return (b.statistics?.favorites || 0) - (a.statistics?.favorites || 0);
-      default:
-        return 0;
-    }
-  });
+    return matches
+      .filter((match) => {
+        if (filters.search) {
+          const searchLower = filters.search.toLowerCase();
+          if (!match.teams.home.name.toLowerCase().includes(searchLower) &&
+              !match.teams.away.name.toLowerCase().includes(searchLower)) {
+            return false;
+          }
+        }
+        
+        if (filters.league && match.league.id.toString() !== filters.league) {
+          return false;
+        }
+        
+        return true;
+      })
+      .sort((a, b) => {
+        switch (filters.sortBy) {
+          case "date":
+            return new Date(a.fixture.date).getTime() - new Date(b.fixture.date).getTime();
+          case "probability":
+            return (b.predictions?.winning_percent || 0) - (a.predictions?.winning_percent || 0);
+          case "popularity":
+            return (b.statistics?.favorites || 0) - (a.statistics?.favorites || 0);
+          default:
+            return 0;
+        }
+      });
+  }, [matches, filters.search, filters.league, filters.sortBy]);
 
   return {
     matches: filteredMatches,
