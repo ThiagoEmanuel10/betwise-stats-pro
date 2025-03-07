@@ -1,0 +1,105 @@
+
+{
+  "common": {
+    "back": "Back",
+    "save": "Save",
+    "cancel": "Cancel",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "submit": "Submit"
+  },
+  "navigation": {
+    "home": "Home",
+    "predictions": "Predictions",
+    "live": "Live",
+    "statistics": "Statistics",
+    "profile": "Profile",
+    "settings": "Settings",
+    "documentation": "Documentation",
+    "chat": "Chat",
+    "dashboard": "Dashboard",
+    "logout": "Logout"
+  },
+  "auth": {
+    "signIn": "Sign In",
+    "signUp": "Sign Up",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "forgotPassword": "Forgot Password?",
+    "orContinueWith": "Or continue with",
+    "dontHaveAccount": "Don't have an account?",
+    "alreadyHaveAccount": "Already have an account?"
+  },
+  "predictions": {
+    "title": "Match Predictions",
+    "search": "Search team",
+    "onlyLive": "Only Live",
+    "sortBy": "Sort by",
+    "date": "Date",
+    "probability": "Probability",
+    "popularity": "Popularity",
+    "noMatchesFound": "No matches found",
+    "share": "Share Prediction",
+    "favorite": "Add to Favorites",
+    "unfavorite": "Remove from Favorites",
+    "comments": "Comments",
+    "addComment": "Add a comment..."
+  },
+  "profile": {
+    "title": "Profile",
+    "editProfile": "Edit Profile",
+    "username": "Username",
+    "bio": "Bio",
+    "favoriteTeam": "Favorite Team",
+    "predictionsHistory": "Predictions History",
+    "subscription": "Subscription Plan",
+    "upgrade": "Upgrade Plan",
+    "changePassword": "Change Password",
+    "notifications": "Notifications",
+    "language": "Language"
+  },
+  "settings": {
+    "title": "Settings",
+    "account": "Account",
+    "appearance": "Appearance",
+    "notifications": "Notifications",
+    "subscription": "Subscription",
+    "language": "Language",
+    "darkMode": "Dark Mode",
+    "lightMode": "Light Mode",
+    "systemDefault": "System Default",
+    "notificationsEnabled": "Notifications Enabled",
+    "emailNotifications": "Email Notifications",
+    "pushNotifications": "Push Notifications",
+    "changeEmail": "Change Email",
+    "changePassword": "Change Password",
+    "deleteAccount": "Delete Account",
+    "logOut": "Log Out"
+  },
+  "statistics": {
+    "title": "Statistics",
+    "last7Days": "Last 7 Days",
+    "last30Days": "Last 30 Days",
+    "last90Days": "Last 90 Days",
+    "allTime": "All Time",
+    "accuracy": "Accuracy",
+    "predictions": "Predictions",
+    "combined": "Combined",
+    "league": "League",
+    "headToHead": "Head to Head",
+    "homeAway": "Home/Away",
+    "resultTrends": "Result Trends",
+    "correctPredictions": "Correct Predictions",
+    "incorrectPredictions": "Incorrect Predictions",
+    "totalPredictions": "Total Predictions",
+    "successRate": "Success Rate",
+    "settings": "Settings"
+  },
+  "languages": {
+    "en": "English",
+    "pt": "Portuguese",
+    "es": "Spanish"
+  }
+}

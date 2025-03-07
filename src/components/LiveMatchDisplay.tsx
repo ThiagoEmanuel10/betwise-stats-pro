@@ -1,5 +1,6 @@
 
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { Card } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { Trophy } from "lucide-react";
@@ -10,6 +11,7 @@ interface LiveMatchProps {
 }
 
 export const LiveMatchDisplay = ({ matchId }: LiveMatchProps) => {
+  const { t } = useTranslation();
   const [match, setMatch] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -37,7 +39,7 @@ export const LiveMatchDisplay = ({ matchId }: LiveMatchProps) => {
         }
       } catch (err) {
         console.error('Error fetching match:', err);
-        setError('Não foi possível carregar os dados do jogo');
+        setError(t('predictions.errorLoadingMatch', 'Could not load match data'));
       } finally {
         setLoading(false);
       }
@@ -45,16 +47,16 @@ export const LiveMatchDisplay = ({ matchId }: LiveMatchProps) => {
 
     fetchMatchData();
 
-    // Configurar atualização periódica
-    const interval = setInterval(fetchMatchData, 30000); // Atualiza a cada 30 segundos
+    // Setup periodic update
+    const interval = setInterval(fetchMatchData, 30000); // Update every 30 seconds
     
     return () => clearInterval(interval);
-  }, [matchId]);
+  }, [matchId, t]);
 
   if (!matchId) {
     return (
       <Card className="p-4 text-center">
-        <p className="text-muted-foreground">Selecione um jogo para acompanhar ao vivo</p>
+        <p className="text-muted-foreground">{t('predictions.selectMatchToWatch', 'Select a match to watch live')}</p>
       </Card>
     );
   }
@@ -80,7 +82,7 @@ export const LiveMatchDisplay = ({ matchId }: LiveMatchProps) => {
   if (!match) {
     return (
       <Card className="p-4 text-center">
-        <p className="text-muted-foreground">Jogo não encontrado</p>
+        <p className="text-muted-foreground">{t('predictions.matchNotFound', 'Match not found')}</p>
       </Card>
     );
   }
@@ -95,10 +97,10 @@ export const LiveMatchDisplay = ({ matchId }: LiveMatchProps) => {
           </span>
         </div>
         <div className="px-2 py-1 bg-primary/10 rounded text-xs font-semibold text-primary">
-          {match.fixture.status.short === "1H" ? "1º Tempo" :
-           match.fixture.status.short === "HT" ? "Intervalo" :
-           match.fixture.status.short === "2H" ? "2º Tempo" :
-           match.fixture.status.short === "FT" ? "Finalizado" : "Em breve"}
+          {match.fixture.status.short === "1H" ? t('predictions.firstHalf', '1st Half') :
+           match.fixture.status.short === "HT" ? t('predictions.halfTime', 'Half Time') :
+           match.fixture.status.short === "2H" ? t('predictions.secondHalf', '2nd Half') :
+           match.fixture.status.short === "FT" ? t('predictions.fullTime', 'Full Time') : t('predictions.upcoming', 'Upcoming')}
         </div>
       </div>
       
@@ -132,7 +134,7 @@ export const LiveMatchDisplay = ({ matchId }: LiveMatchProps) => {
 
       {match.events && match.events.length > 0 && (
         <div className="mt-4 p-2 bg-background/50 rounded-lg max-h-24 overflow-y-auto">
-          <h4 className="text-xs font-medium mb-1">Últimos Eventos:</h4>
+          <h4 className="text-xs font-medium mb-1">{t('predictions.latestEvents', 'Latest Events:')}</h4>
           <div className="space-y-1">
             {match.events.slice(0, 3).map((event: any, index: number) => (
               <div key={index} className="text-xs flex items-center gap-1">

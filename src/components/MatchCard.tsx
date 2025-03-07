@@ -1,5 +1,6 @@
 
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Star, MessageCircle, Heart } from "lucide-react";
@@ -18,6 +19,7 @@ interface MatchCardProps {
 }
 
 export function MatchCard({ fixture, isFavorite = false, onToggleFavorite }: MatchCardProps) {
+  const { t } = useTranslation();
   const [showComments, setShowComments] = useState(false);
   const [isAddingTeam, setIsAddingTeam] = useState(false);
   const matchDate = new Date(fixture.fixture.date);
@@ -40,8 +42,8 @@ export function MatchCard({ fixture, isFavorite = false, onToggleFavorite }: Mat
       
       if (!session) {
         toast({
-          title: "Erro",
-          description: "Você precisa estar logado para favoritar times.",
+          title: t('common.error'),
+          description: t('predictions.loginToFavorite', 'You need to be logged in to favorite teams'),
           variant: "destructive"
         });
         navigate('/auth');
@@ -62,7 +64,7 @@ export function MatchCard({ fixture, isFavorite = false, onToggleFavorite }: Mat
       
       if (existingFavorite) {
         toast({
-          description: "Time já está nos favoritos"
+          description: t('predictions.teamAlreadyFavorite', 'Team is already in favorites')
         });
         return;
       }
@@ -80,13 +82,13 @@ export function MatchCard({ fixture, isFavorite = false, onToggleFavorite }: Mat
       if (error) throw error;
       
       toast({
-        description: `${team.name} adicionado aos favoritos`
+        description: t('predictions.teamAddedToFavorites', '{{teamName}} added to favorites', { teamName: team.name })
       });
     } catch (error) {
       console.error('Error adding team to favorites:', error);
       toast({
-        title: "Erro",
-        description: "Não foi possível adicionar o time aos favoritos",
+        title: t('common.error'),
+        description: t('predictions.errorAddingTeamToFavorites', 'Could not add team to favorites'),
         variant: "destructive"
       });
     } finally {
@@ -113,7 +115,7 @@ export function MatchCard({ fixture, isFavorite = false, onToggleFavorite }: Mat
                 matchId={fixture.fixture.id.toString()}
                 homeTeam={fixture.teams.home.name}
                 awayTeam={fixture.teams.away.name}
-                league={fixture.league?.name || "Unknown League"}
+                league={fixture.league?.name || t('predictions.unknownLeague', 'Unknown League')}
                 date={fixture.fixture.date}
               />
               <Button

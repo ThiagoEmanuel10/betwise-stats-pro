@@ -1,5 +1,6 @@
 
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -29,6 +30,7 @@ interface AdvancedFiltersProps {
 
 export function AdvancedFilters({ filters, onFiltersChange, leagues }: AdvancedFiltersProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const { t } = useTranslation();
 
   return (
     <div className="space-y-4">
@@ -39,20 +41,20 @@ export function AdvancedFilters({ filters, onFiltersChange, leagues }: AdvancedF
       >
         <span className="flex items-center gap-2">
           <Filter className="w-4 h-4" />
-          Filtros Avançados
+          {t('predictions.advancedFilters', 'Advanced Filters')}
         </span>
         <span className="text-xs text-muted-foreground">
-          {filters.onlyLive ? "Ao vivo" : "Todos"}
+          {filters.onlyLive ? t('predictions.live', 'Live') : t('predictions.all', 'All')}
         </span>
       </Button>
 
       {isOpen && (
         <div className="glass p-4 rounded-lg space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="search">Buscar times</Label>
+            <Label htmlFor="search">{t('predictions.searchTeams', 'Search teams')}</Label>
             <Input
               id="search"
-              placeholder="Digite o nome do time..."
+              placeholder={t('predictions.search')}
               value={filters.search}
               onChange={(e) =>
                 onFiltersChange({ ...filters, search: e.target.value })
@@ -61,7 +63,7 @@ export function AdvancedFilters({ filters, onFiltersChange, leagues }: AdvancedF
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="league">Liga</Label>
+            <Label htmlFor="league">{t('statistics.league')}</Label>
             <Select
               value={filters.league}
               onValueChange={(value) =>
@@ -69,7 +71,7 @@ export function AdvancedFilters({ filters, onFiltersChange, leagues }: AdvancedF
               }
             >
               <SelectTrigger>
-                <SelectValue placeholder="Selecione uma liga" />
+                <SelectValue placeholder={t('predictions.selectLeague', 'Select a league')} />
               </SelectTrigger>
               <SelectContent>
                 {Object.entries(leagues).map(([id, name]) => (
@@ -82,7 +84,7 @@ export function AdvancedFilters({ filters, onFiltersChange, leagues }: AdvancedF
           </div>
 
           <div className="flex items-center justify-between">
-            <Label htmlFor="onlyLive">Apenas jogos ao vivo</Label>
+            <Label htmlFor="onlyLive">{t('predictions.onlyLive')}</Label>
             <Switch
               id="onlyLive"
               checked={filters.onlyLive}
@@ -93,7 +95,7 @@ export function AdvancedFilters({ filters, onFiltersChange, leagues }: AdvancedF
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="sortBy">Ordenar por</Label>
+            <Label htmlFor="sortBy">{t('predictions.sortBy')}</Label>
             <Select
               value={filters.sortBy}
               onValueChange={(value: "date" | "probability" | "popularity") =>
@@ -107,11 +109,11 @@ export function AdvancedFilters({ filters, onFiltersChange, leagues }: AdvancedF
                 <SelectItem value="date">
                   <span className="flex items-center gap-2">
                     <SortDesc className="w-4 h-4" />
-                    Data
+                    {t('predictions.date')}
                   </span>
                 </SelectItem>
-                <SelectItem value="probability">Probabilidade</SelectItem>
-                <SelectItem value="popularity">Popularidade</SelectItem>
+                <SelectItem value="probability">{t('predictions.probability')}</SelectItem>
+                <SelectItem value="popularity">{t('predictions.popularity')}</SelectItem>
               </SelectContent>
             </Select>
           </div>

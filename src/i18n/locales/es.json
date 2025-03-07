@@ -1,0 +1,105 @@
+
+{
+  "common": {
+    "back": "Volver",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "loading": "Cargando...",
+    "error": "Error",
+    "success": "Éxito",
+    "submit": "Enviar"
+  },
+  "navigation": {
+    "home": "Inicio",
+    "predictions": "Predicciones",
+    "live": "En Vivo",
+    "statistics": "Estadísticas",
+    "profile": "Perfil",
+    "settings": "Configuración",
+    "documentation": "Documentación",
+    "chat": "Chat",
+    "dashboard": "Panel",
+    "logout": "Cerrar Sesión"
+  },
+  "auth": {
+    "signIn": "Iniciar Sesión",
+    "signUp": "Registrarse",
+    "email": "Email",
+    "password": "Contraseña",
+    "confirmPassword": "Confirmar Contraseña",
+    "forgotPassword": "¿Olvidó su contraseña?",
+    "orContinueWith": "O continuar con",
+    "dontHaveAccount": "¿No tiene una cuenta?",
+    "alreadyHaveAccount": "¿Ya tiene una cuenta?"
+  },
+  "predictions": {
+    "title": "Predicciones de Partidos",
+    "search": "Buscar equipo",
+    "onlyLive": "Solo en vivo",
+    "sortBy": "Ordenar por",
+    "date": "Fecha",
+    "probability": "Probabilidad",
+    "popularity": "Popularidad",
+    "noMatchesFound": "No se encontraron partidos",
+    "share": "Compartir Predicción",
+    "favorite": "Añadir a Favoritos",
+    "unfavorite": "Quitar de Favoritos",
+    "comments": "Comentarios",
+    "addComment": "Añadir un comentario..."
+  },
+  "profile": {
+    "title": "Perfil",
+    "editProfile": "Editar Perfil",
+    "username": "Nombre de usuario",
+    "bio": "Biografía",
+    "favoriteTeam": "Equipo Favorito",
+    "predictionsHistory": "Historial de Predicciones",
+    "subscription": "Plan de Suscripción",
+    "upgrade": "Actualizar Plan",
+    "changePassword": "Cambiar Contraseña",
+    "notifications": "Notificaciones",
+    "language": "Idioma"
+  },
+  "settings": {
+    "title": "Configuración",
+    "account": "Cuenta",
+    "appearance": "Apariencia",
+    "notifications": "Notificaciones",
+    "subscription": "Suscripción",
+    "language": "Idioma",
+    "darkMode": "Modo Oscuro",
+    "lightMode": "Modo Claro",
+    "systemDefault": "Predeterminado del Sistema",
+    "notificationsEnabled": "Notificaciones Activadas",
+    "emailNotifications": "Notificaciones por Email",
+    "pushNotifications": "Notificaciones Push",
+    "changeEmail": "Cambiar Email",
+    "changePassword": "Cambiar Contraseña",
+    "deleteAccount": "Eliminar Cuenta",
+    "logOut": "Cerrar Sesión"
+  },
+  "statistics": {
+    "title": "Estadísticas",
+    "last7Days": "Últimos 7 Días",
+    "last30Days": "Últimos 30 Días",
+    "last90Days": "Últimos 90 Días",
+    "allTime": "Todo el Período",
+    "accuracy": "Precisión",
+    "predictions": "Predicciones",
+    "combined": "Combinado",
+    "league": "Liga",
+    "headToHead": "Mano a Mano",
+    "homeAway": "Local/Visitante",
+    "resultTrends": "Tendencias de Resultados",
+    "correctPredictions": "Predicciones Correctas",
+    "incorrectPredictions": "Predicciones Incorrectas",
+    "totalPredictions": "Total de Predicciones",
+    "successRate": "Tasa de Éxito",
+    "settings": "Configuración"
+  },
+  "languages": {
+    "en": "Inglés",
+    "pt": "Portugués",
+    "es": "Español"
+  }
+}

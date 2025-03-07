@@ -4,6 +4,14 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import { PredictionsHeader } from '@/components/PredictionsHeader';
 
+// Mock the i18next
+vi.mock('react-i18next', () => ({
+  useTranslation: () => ({
+    t: (key: string) => key,
+    i18n: { language: 'en', changeLanguage: vi.fn() }
+  })
+}));
+
 // Mock the child components
 vi.mock('@/components/AdvancedFilters', () => ({
   default: ({ onFilterChange }: any) => (
@@ -36,8 +44,8 @@ describe('PredictionsHeader Component', () => {
       </BrowserRouter>
     );
 
-    expect(screen.getByPlaceholderText(/buscar time/i)).toBeInTheDocument();
-    expect(screen.getByText(/somente ao vivo/i)).toBeInTheDocument();
+    expect(screen.getByPlaceholderText(/predictions.search/i)).toBeInTheDocument();
+    expect(screen.getByText(/predictions.onlyLive/i)).toBeInTheDocument();
     expect(screen.getByTestId('advanced-filters')).toBeInTheDocument();
   });
 
@@ -48,7 +56,7 @@ describe('PredictionsHeader Component', () => {
       </BrowserRouter>
     );
 
-    const searchInput = screen.getByPlaceholderText(/buscar time/i);
+    const searchInput = screen.getByPlaceholderText(/predictions.search/i);
     fireEvent.change(searchInput, { target: { value: 'Barcelona' } });
 
     expect(defaultProps.onFiltersChange).toHaveBeenCalledWith({
@@ -64,7 +72,7 @@ describe('PredictionsHeader Component', () => {
       </BrowserRouter>
     );
 
-    const liveToggle = screen.getByRole('checkbox', { name: /somente ao vivo/i });
+    const liveToggle = screen.getByRole('checkbox', { name: /predictions.onlyLive/i });
     fireEvent.click(liveToggle);
 
     expect(defaultProps.onFiltersChange).toHaveBeenCalledWith({
